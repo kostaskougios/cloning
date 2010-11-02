@@ -145,6 +145,9 @@
 					<descriptors>
 						<descriptor>src/main/assembly/dist.xml</descriptor>
 					</descriptors>
+					<descriptorRefs>
+						<descriptorRef>project</descriptorRef>
+					</descriptorRefs>
 				</configuration>
 			</plugin>
 		</plugins>
