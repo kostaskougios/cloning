@@ -35,6 +35,7 @@
   </fileSets>
   <dependencySets>
     <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <scope>runtime</scope>
       <outputDirectory>lib</outputDirectory>
     </dependencySet>
