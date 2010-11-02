@@ -430,7 +430,6 @@ public class TestCloner extends TestCase
 				assertEquals(n1, n2);
 			} else
 			{
-				// BUG: this point fails. For some reason the order of the elements in a hashset changes during cloning.
 				assertSame(n1, n2);
 			}
 		}
