@@ -34,6 +34,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<scm>
+		<connection>scm:svn:http://cloning.googlecode.com/svn/</connection>
+		<developerConnection>scm:svn:https://cloning.googlecode.com/svn/</developerConnection>
+		<url>https://code.google.com/p/cloning/source/browse/</url>
+	</scm>
 	<build>
 		<plugins>
 			<plugin>
