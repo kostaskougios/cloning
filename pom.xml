@@ -9,7 +9,7 @@
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>jar</packaging>
-	<version>1.7.4-SNAPSHOT</version>
+	<version>1.7.4</version>
 	<name>cloning</name>
 
 	<url>http://robust-it.co.uk/clone/</url>
@@ -42,9 +42,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<scm>
-		<connection>scm:svn:http://cloning.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://cloning.googlecode.com/svn/trunk</developerConnection>
-		<url>https://code.google.com/p/cloning/source/browse/</url>
+		<connection>scm:svn:http://cloning.googlecode.com/svn/tags/1.7.4</connection>
+		<developerConnection>scm:svn:https://cloning.googlecode.com/svn/tags/1.7.4</developerConnection>
+		<url>https://code.google.com/p/cloning/source/browse/tags/1.7.4</url>
 	</scm>
 	<issueManagement>
 		<system>Google Code</system>
