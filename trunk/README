@@ -1,0 +1,14 @@
+This is the main directory of the source code of the Cloning library.
+
+In order to create the Eclipse project, run "mvn eclipse:eclipse". You will
+need Maven 2.2 or higher to run the above command. Please visit the Maven
+website for detailed instructions:
+
+http://maven.apache.org/
+
+Once the command has been successfully executed, you may simply import the
+project to your workspace, using the included launch configurations to run
+some of the test suites. Alternatively, you can right-click on a test suite
+or the whole project and select "Run As > JUnit Test".
+
+Happy hacking!

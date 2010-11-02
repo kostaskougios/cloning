@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="tests"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/junit-4.5.jar" sourcepath="/home/ariskk/workspace/libs/junit-4.5-src.jar"/>
-	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
