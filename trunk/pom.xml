@@ -162,14 +162,4 @@
 			<version>1.2</version>
 		</dependency>
 	</dependencies>
-	<distributionManagement>
-		<repository>
-			<id>ossrh</id>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
