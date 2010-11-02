@@ -6,18 +6,25 @@
 	<version>1.7.3</version>
 	<name>cloning</name>
 	<url>http://robust-it.co.uk/clone/</url>
-	<description>
-		The cloning library is a small, open source (apache licence) java library which deep-clones objects. The objects don't have to implement the Cloneable interface. Effectivelly, this library can clone ANY java objects. It can be used i.e. in cache implementations if you don't want the cached object to be modified or whenever you want to create a deep copy of objects.
-		
+	<description><![CDATA[
+		The cloning library is a small, open source (Apache
+		licensed) Java library which deep-clones objects. The
+		objects do not have to implement the Cloneable
+		interface. Effectivelly, this library can clone ANY
+		Java object. It can be used i.e. in cache
+		implementations, if you don't want the cached object
+		to be modified or whenever you want to create a deep
+		copy of an object.
+
 		Sample usage:
-	
+
 		You can create a single instance of cloner and use it throughout your application. i.e.
 		Cloner cloner=new Cloner();
 		...
 		cloner.deepClone(o);
-		
+
 		Please check http://robust-it.co.uk/clone/ for more examples (spring integration, immutable objects etc)
-	</description>
+	]]></description>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
