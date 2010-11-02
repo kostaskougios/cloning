@@ -55,8 +55,8 @@ public class Perspectives
 	 * @param <I>								the type of the elements of the collection o
 	 * @param <E>								the type of the perspective collection
 	 * @param <NI>								the type of the perspective's elements
-	 * @param perspectiveCollectionClass		the class of E
-	 * @param currentCollection					the collection instance
+	 * @param newCollection			the collection to which the adapted instances should be added
+	 * @param currentCollection			the collection with the instances to be adapted
 	 * @param perspectiveCollectionItemClass	the class of the NI
 	 * @return									E, the collection from a different perspective or null if currentCollection is null
 	 */
