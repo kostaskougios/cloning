@@ -115,9 +115,20 @@
 			<plugin>
 				<artifactId>maven-repository-plugin</artifactId>
 				<version>2.3.1</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals><goal>single</goal></goals>
+					</execution>
+				</executions>
 				<configuration>
-					<!-- There is no public SCM for this project -->
-					<disableMaterialization>true</disableMaterialization>
+					<descriptors>
+						<descriptor>src/main/assembly/dist.xml</descriptor>
+					</descriptors>
 				</configuration>
 			</plugin>
 		</plugins>
