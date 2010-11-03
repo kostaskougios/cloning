@@ -11,7 +11,8 @@ import java.util.Map;
 public class FastClonerHashMap implements IFastCloner
 {
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final HashMap<Object, Object> m = (HashMap) t;

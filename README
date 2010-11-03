@@ -1,3 +1,5 @@
+For queries/bug reports, please contact kostas.kougios@googlemail.com
+
 This is the main directory of the source code of the Cloning library.
 
 In order to create the Eclipse project, run "mvn eclipse:eclipse". You will

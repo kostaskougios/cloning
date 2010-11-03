@@ -9,10 +9,11 @@ import java.util.Map;
  * 21 May 2009
  */
 @SuppressWarnings("unchecked")
-public abstract class FastClonerCustomCollection<T extends Collection> implements IFastCloner
+public abstract class FastClonerCustomCollection<T extends Collection<Object>> implements IFastCloner
 {
 	public abstract T getInstance();
 
+	@Override
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final T c = getInstance();

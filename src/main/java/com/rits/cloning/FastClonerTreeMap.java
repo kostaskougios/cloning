@@ -11,7 +11,8 @@ import java.util.TreeMap;
 public class FastClonerTreeMap implements IFastCloner
 {
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final TreeMap<Object, Object> m = (TreeMap) t;

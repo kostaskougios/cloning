@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-
 /**
  * @author kostantinos.kougios
  *
@@ -13,7 +12,8 @@ import java.util.Map;
 public class FastClonerHashSet implements IFastCloner
 {
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final HashSet al = (HashSet) t;

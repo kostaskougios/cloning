@@ -3,7 +3,6 @@ package com.rits.cloning;
 import java.util.ArrayList;
 import java.util.Map;
 
-
 /**
  * @author kostantinos.kougios
  *
@@ -12,7 +11,8 @@ import java.util.Map;
 public class FastClonerArrayList implements IFastCloner
 {
 
-	@SuppressWarnings("unchecked")
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final ArrayList al = (ArrayList) t;
