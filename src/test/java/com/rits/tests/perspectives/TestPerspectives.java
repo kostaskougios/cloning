@@ -10,6 +10,7 @@ import com.rits.tests.perspectives.model.OrderedProduct;
 import com.rits.tests.perspectives.model.OrderedProducts;
 import com.rits.tests.perspectives.model.Product;
 import com.rits.tests.perspectives.model.Products;
+import com.rits.tests.perspectives.model.RelatedProduct;
 
 /**
  * @author kostantinos.kougios
@@ -37,6 +38,15 @@ public class TestPerspectives extends TestCase
 		assertEquals(product.getTitle(), orderedProduct.getTitle());
 		assertEquals(new BigDecimal("5.44"), orderedProduct.getPrice());
 		assertEquals(5, orderedProduct.getQty());
+	}
+
+	public void testViewAs2ExtendedSubclasses()
+	{
+		final Product relatedProduct = new RelatedProduct(8, "X5", "RX5");
+		final OrderedProduct op = perspectives.viewAs(OrderedProduct.class, relatedProduct);
+		assertEquals(relatedProduct.getId(), op.getId());
+		assertEquals(relatedProduct.getSku(), op.getSku());
+		assertEquals(relatedProduct.getTitle(), op.getTitle());
 	}
 
 	public void testViewAsNull()

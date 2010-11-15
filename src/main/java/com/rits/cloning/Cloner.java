@@ -442,6 +442,7 @@ public class Cloner
 			return;
 		}
 		final List<Field> fields = allFields(srcClz);
+		final List<Field> destFields = allFields(dest.getClass());
 		for (final Field field : fields)
 		{
 			if (!Modifier.isStatic(field.getModifiers()))
@@ -450,7 +451,10 @@ public class Cloner
 				{
 					final Object fieldObject = field.get(src);
 					field.setAccessible(true);
-					field.set(dest, fieldObject);
+					if (destFields.contains(field))
+					{
+						field.set(dest, fieldObject);
+					}
 				} catch (final IllegalArgumentException e)
 				{
 					throw new RuntimeException(e);
