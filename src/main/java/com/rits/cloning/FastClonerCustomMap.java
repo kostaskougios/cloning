@@ -8,11 +8,10 @@ import java.util.Set;
  *
  * 21 May 2009
  */
-@SuppressWarnings("unchecked")
-public abstract class FastClonerCustomMap<T extends Map<Object, Object>> implements IFastCloner
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 {
 	@Override
-	@SuppressWarnings("rawtypes")
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final T m = (T) t;

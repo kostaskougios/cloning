@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 import com.rits.cloning.Cloner;
 import com.rits.tests.cloning.domain.A;
 import com.rits.tests.cloning.domain.B;
+import com.rits.tests.cloning.domain.F;
 
 /**
  * @author kostantinos.kougios
@@ -532,6 +533,13 @@ public class TestCloner extends TestCase
 		assertEquals(10, b.getY());
 	}
 
+	public void testFreezable()
+	{
+		final F f = new F();
+		assertNotSame(f, cloner.deepClone(f));
+		f.setFrozen(true);
+		assertSame(f, cloner.deepClone(f));
+	}
 	//	public void testCopyPropertiesDifferentClasses()
 	//	{
 	//		final A a = new A();

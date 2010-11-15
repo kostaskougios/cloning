@@ -8,8 +8,8 @@ import java.util.Map;
  *
  * 21 May 2009
  */
-@SuppressWarnings("unchecked")
-public abstract class FastClonerCustomCollection<T extends Collection<Object>> implements IFastCloner
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public abstract class FastClonerCustomCollection<T extends Collection> implements IFastCloner
 {
 	public abstract T getInstance();
 
@@ -20,8 +20,8 @@ public abstract class FastClonerCustomCollection<T extends Collection<Object>> i
 		final T l = (T) t;
 		for (final Object o : l)
 		{
-			final Object cloneInternal = cloner.cloneInternal(o, clones);
-			c.add(cloneInternal);
+			final Object clone = cloner.cloneInternal(o, clones);
+			c.add(clone);
 		}
 		return c;
 	}

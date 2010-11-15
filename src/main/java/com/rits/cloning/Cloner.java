@@ -349,6 +349,11 @@ public class Cloner
 		// skip cloning ignored classes
 		if (nullInstead.contains(clz)) return null;
 		if (ignored.contains(clz)) return o;
+		if (o instanceof IFreezable)
+		{
+			final IFreezable f = (IFreezable) o;
+			if (f.isFrozen()) return o;
+		}
 		final Object clonedPreviously = clones != null ? clones.get(o) : null;
 		if (clonedPreviously != null) return (T) clonedPreviously;
 
@@ -444,6 +449,7 @@ public class Cloner
 				try
 				{
 					final Object fieldObject = field.get(src);
+					field.setAccessible(true);
 					field.set(dest, fieldObject);
 				} catch (final IllegalArgumentException e)
 				{
