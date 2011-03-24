@@ -1,5 +1,6 @@
 package com.rits.cloning;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -334,6 +335,16 @@ public class Cloner
 		}
 	}
 
+	private boolean isImmutable(final Class<?> clz)
+	{
+		final Annotation[] annotations = clz.getDeclaredAnnotations();
+		for (final Annotation annotation : annotations)
+		{
+			if (annotation.getClass() == Immutable.class) return true;
+		}
+		return false;
+	}
+
 	/**
 	 * PLEASE DONT CALL THIS METHOD
 	 * The only reason for been public is because IFastCloner must invoke it
@@ -349,6 +360,7 @@ public class Cloner
 		// skip cloning ignored classes
 		if (nullInstead.contains(clz)) return null;
 		if (ignored.contains(clz)) return o;
+		if (isImmutable(clz)) return o;
 		if (o instanceof IFreezable)
 		{
 			final IFreezable f = (IFreezable) o;
