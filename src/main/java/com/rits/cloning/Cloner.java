@@ -337,10 +337,22 @@ public class Cloner
 
 	private boolean isImmutable(final Class<?> clz)
 	{
-		final Annotation[] annotations = clz.getAnnotations();
-		for (final Annotation annotation : annotations)
+		for (final Annotation annotation : clz.getDeclaredAnnotations())
 		{
 			if (annotation.annotationType() == Immutable.class) return true;
+		}
+		Class<?> c = clz.getSuperclass();
+		while (c != null && c != Object.class)
+		{
+			for (final Annotation annotation : c.getDeclaredAnnotations())
+			{
+				if (annotation.annotationType() == Immutable.class)
+				{
+					final Immutable im = (Immutable) annotation;
+					if (im.subClass()) return true;
+				}
+			}
+			c = c.getSuperclass();
 		}
 		return false;
 	}

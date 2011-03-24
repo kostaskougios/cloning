@@ -61,11 +61,11 @@ public class TestCloner extends TestCase
 	{
 	}
 
-	public void testImmutable()
+	public void testImmutableSubclassNotEnabled()
 	{
-		final ATestImmutable a = new ATestImmutable();
-		final ATestImmutable ca = cloner.deepClone(a);
-		assertSame(a, ca);
+		final BTestImmutableSubclass a = new BTestImmutableSubclass();
+		final BTestImmutableSubclass ca = cloner.deepClone(a);
+		assertNotSame(a, ca);
 	}
 
 	public void testImmutableSubclass()
@@ -75,11 +75,11 @@ public class TestCloner extends TestCase
 		assertSame(a, ca);
 	}
 
-	public void testImmutableSubclassNotEnabled()
+	public void testImmutable()
 	{
-		final BTestImmutableSubclass a = new BTestImmutableSubclass();
-		final BTestImmutableSubclass ca = cloner.deepClone(a);
-		assertNotSame(a, ca);
+		final ATestImmutable a = new ATestImmutable();
+		final ATestImmutable ca = cloner.deepClone(a);
+		assertSame(a, ca);
 	}
 
 	/**
