@@ -17,6 +17,7 @@ import java.util.TreeSet;
 import junit.framework.TestCase;
 
 import com.rits.cloning.Cloner;
+import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.domain.A;
 import com.rits.tests.cloning.domain.B;
 import com.rits.tests.cloning.domain.F;
@@ -39,6 +40,46 @@ public class TestCloner extends TestCase
 		{
 			x = 5;
 		}
+	}
+
+	@Immutable(subClass = true)
+	static public class ATestImmutable
+	{
+	}
+
+	static public class ATestImmutableSubclass extends ATestImmutable
+	{
+
+	}
+
+	@Immutable
+	static public class BTestImmutable
+	{
+	}
+
+	static public class BTestImmutableSubclass extends BTestImmutable
+	{
+	}
+
+	public void testImmutable()
+	{
+		final ATestImmutable a = new ATestImmutable();
+		final ATestImmutable ca = cloner.deepClone(a);
+		assertSame(a, ca);
+	}
+
+	public void testImmutableSubclass()
+	{
+		final ATestImmutableSubclass a = new ATestImmutableSubclass();
+		final ATestImmutable ca = cloner.deepClone(a);
+		assertSame(a, ca);
+	}
+
+	public void testImmutableSubclassNotEnabled()
+	{
+		final BTestImmutableSubclass a = new BTestImmutableSubclass();
+		final BTestImmutableSubclass ca = cloner.deepClone(a);
+		assertNotSame(a, ca);
 	}
 
 	/**
