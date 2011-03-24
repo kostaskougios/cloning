@@ -335,11 +335,20 @@ public class Cloner
 		}
 	}
 
+	// caches immutables for quick reference
+	private final ConcurrentHashMap<Class<?>, Boolean>	immutables	= new ConcurrentHashMap<Class<?>, Boolean>();
+
 	private boolean isImmutable(final Class<?> clz)
 	{
+		final Boolean b = immutables.get(clz);
+		if (b != null && b) return true;
 		for (final Annotation annotation : clz.getDeclaredAnnotations())
 		{
-			if (annotation.annotationType() == Immutable.class) return true;
+			if (annotation.annotationType() == Immutable.class)
+			{
+				immutables.put(clz, Boolean.TRUE);
+				return true;
+			}
 		}
 		Class<?> c = clz.getSuperclass();
 		while (c != null && c != Object.class)
@@ -349,7 +358,11 @@ public class Cloner
 				if (annotation.annotationType() == Immutable.class)
 				{
 					final Immutable im = (Immutable) annotation;
-					if (im.subClass()) return true;
+					if (im.subClass())
+					{
+						immutables.put(clz, Boolean.TRUE);
+						return true;
+					}
 				}
 			}
 			c = c.getSuperclass();
