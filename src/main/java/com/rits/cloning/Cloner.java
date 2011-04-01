@@ -314,6 +314,28 @@ public class Cloner
 		}
 	}
 
+	public <T> T deepCloneDontCloneInstances(final T o, final Object... dontCloneThese)
+	{
+		if (o == null) return null;
+		if (!cloningEnabled) return o;
+		if (dumpClonedClasses)
+		{
+			System.out.println("start>" + o.getClass());
+		}
+		final Map<Object, Object> clones = new IdentityHashMap<Object, Object>(16);
+		for (final Object dc : dontCloneThese)
+		{
+			clones.put(dc, dc);
+		}
+		try
+		{
+			return cloneInternal(o, clones);
+		} catch (final IllegalAccessException e)
+		{
+			throw new CloningException("error during cloning of " + o, e);
+		}
+	}
+
 	/**
 	 * shallow clones "o". This means that if c=shallowClone(o) then
 	 * c!=o. Any change to c won't affect o.

@@ -21,6 +21,7 @@ import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.domain.A;
 import com.rits.tests.cloning.domain.B;
 import com.rits.tests.cloning.domain.F;
+import com.rits.tests.cloning.domain.G;
 
 /**
  * @author kostantinos.kougios
@@ -581,17 +582,20 @@ public class TestCloner extends TestCase
 		f.setFrozen(true);
 		assertSame(f, cloner.deepClone(f));
 	}
-	//	public void testCopyPropertiesDifferentClasses()
-	//	{
-	//		final A a = new A();
-	//		final C c = new C();
-	//		c.setName("x");
-	//		c.setX(-1);
-	//		c.setY(10);
-	//		cloner.copyPropertiesOfInheritedClass(a, c);
-	//
-	//		assertEquals("kostas", c.getName());
-	//		assertEquals(5, c.getX());
-	//		assertEquals(10, c.getY());
-	//	}
+
+	public void testDeepCloneDontCloneInstances()
+	{
+		final A a = new A();
+		final B b = new B();
+		final G g = new G(a, b);
+		final G cga = cloner.deepCloneDontCloneInstances(g, a);
+		assertNotSame(g, cga);
+		assertNotSame(cga.getB(), b);
+		assertSame(cga.getA(), a);
+
+		final G cgab = cloner.deepCloneDontCloneInstances(g, a, b);
+		assertNotSame(g, cgab);
+		assertSame(cgab.getB(), b);
+		assertSame(cgab.getA(), a);
+	}
 }
