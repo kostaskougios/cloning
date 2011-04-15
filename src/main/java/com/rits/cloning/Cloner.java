@@ -258,6 +258,7 @@ public class Cloner
 
 	public void registerFastCloner(final Class<?> c, final IFastCloner fastCloner)
 	{
+		if (fastCloners.containsKey(c)) throw new IllegalArgumentException(c + " already fast-cloned!");
 		fastCloners.put(c, fastCloner);
 	}
 
