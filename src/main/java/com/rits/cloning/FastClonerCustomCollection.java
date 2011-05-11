@@ -11,12 +11,12 @@ import java.util.Map;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class FastClonerCustomCollection<T extends Collection> implements IFastCloner
 {
-	public abstract T getInstance();
+	public abstract T getInstance(T o);
 
 	@Override
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
-		final T c = getInstance();
+		final T c = getInstance((T) t);
 		final T l = (T) t;
 		for (final Object o : l)
 		{

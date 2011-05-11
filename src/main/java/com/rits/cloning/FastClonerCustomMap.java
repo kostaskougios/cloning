@@ -15,7 +15,7 @@ public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final T m = (T) t;
-		final T result = getInstance();
+		final T result = getInstance((T) t);
 		final Set<Map.Entry<Object, Object>> entrySet = m.entrySet();
 		for (final Map.Entry e : entrySet)
 		{
@@ -26,6 +26,6 @@ public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 		return result;
 	}
 
-	protected abstract T getInstance();
+	protected abstract T getInstance(T t);
 
 }
