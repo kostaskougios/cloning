@@ -88,6 +88,7 @@ public class Cloner
 		fastCloners.put(HashSet.class, new FastClonerHashSet());
 		fastCloners.put(HashMap.class, new FastClonerHashMap());
 		fastCloners.put(TreeMap.class, new FastClonerTreeMap());
+		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
 	}
 
 	protected Object fastClone(final Object o, final Map<Object, Object> clones) throws IllegalAccessException
@@ -395,10 +396,10 @@ public class Cloner
 
 	/**
 	 * PLEASE DONT CALL THIS METHOD
-	 * The only reason for been public is because IFastCloner must invoke it
+	 * The only reason for been public is because custom IFastCloner's must invoke it
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException
+	public <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		if (o == null) return null;
 		if (o == this) return null;
