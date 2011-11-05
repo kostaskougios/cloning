@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 
 import com.rits.cloning.Cloner;
 import com.rits.cloning.Immutable;
+import com.rits.tests.cloning.TestCloner.SynthOuter.Inner;
 import com.rits.tests.cloning.domain.A;
 import com.rits.tests.cloning.domain.B;
 import com.rits.tests.cloning.domain.F;
@@ -597,5 +598,35 @@ public class TestCloner extends TestCase
 		assertNotSame(g, cgab);
 		assertSame(cgab.getB(), b);
 		assertSame(cgab.getA(), a);
+	}
+
+	static class SynthOuter
+	{
+		public Inner getInner()
+		{
+			return new Inner();
+		}
+
+		class Inner
+		{
+			Object	x	= new Object();
+
+			public SynthOuter getOuter()
+			{
+				return SynthOuter.this;
+			}
+		}
+	}
+
+	public void testDontCloneSynthetic()
+	{
+		final Cloner cloner = new Cloner();
+		cloner.setCloneSynthetics(false);
+		final SynthOuter outer = new SynthOuter();
+		final Inner inner = outer.getInner();
+		final Inner clonedInner = cloner.deepClone(inner);
+		assertNotSame(inner, clonedInner);
+		assertNotSame(inner.x, clonedInner.x);
+		assertSame(outer, clonedInner.getOuter());
 	}
 }

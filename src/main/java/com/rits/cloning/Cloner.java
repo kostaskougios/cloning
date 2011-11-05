@@ -46,6 +46,7 @@ public class Cloner
 	private boolean											dumpClonedClasses	= false;
 	private boolean											cloningEnabled		= true;
 	private boolean											nullTransient		= false;
+	private boolean											cloneSynthetics		= true;
 
 	public boolean isNullTransient()
 	{
@@ -62,6 +63,11 @@ public class Cloner
 	public void setNullTransient(final boolean nullTransient)
 	{
 		this.nullTransient = nullTransient;
+	}
+
+	public void setCloneSynthetics(final boolean cloneSynthetics)
+	{
+		this.cloneSynthetics = cloneSynthetics;
 	}
 
 	public Cloner()
@@ -454,9 +460,10 @@ public class Cloner
 		final List<Field> fields = allFields(clz);
 		for (final Field field : fields)
 		{
-			if (!Modifier.isStatic(field.getModifiers()))
+			final int modifiers = field.getModifiers();
+			if (!Modifier.isStatic(modifiers))
 			{
-				if (nullTransient && Modifier.isTransient(field.getModifiers()))
+				if (nullTransient && Modifier.isTransient(modifiers))
 				{
 					// request by Jonathan : transient fields can be null-ed
 					final Class<?> type = field.getType();
@@ -467,7 +474,8 @@ public class Cloner
 				} else
 				{
 					final Object fieldObject = field.get(o);
-					final Object fieldObjectClone = clones != null ? cloneInternal(fieldObject, clones) : fieldObject;
+					final boolean shouldClone = cloneSynthetics || (!cloneSynthetics && !field.isSynthetic());
+					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpClonedClasses && fieldObjectClone != fieldObject)
 					{
