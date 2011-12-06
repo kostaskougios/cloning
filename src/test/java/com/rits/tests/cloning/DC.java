@@ -14,7 +14,6 @@ public class DC implements Comparable<DC>
 		this.id = id;
 	}
 
-	@Override
 	public int compareTo(final DC o)
 	{
 		return id - o.id;

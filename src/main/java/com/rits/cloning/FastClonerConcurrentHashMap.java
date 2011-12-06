@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FastClonerConcurrentHashMap implements IFastCloner
 {
-	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{

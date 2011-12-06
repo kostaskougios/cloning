@@ -10,8 +10,6 @@ import java.util.Map;
  */
 public class FastClonerHashMap implements IFastCloner
 {
-
-	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
@@ -26,5 +24,4 @@ public class FastClonerHashMap implements IFastCloner
 		}
 		return result;
 	}
-
 }

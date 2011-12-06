@@ -633,9 +633,8 @@ public class TestCloner extends TestCase
 
 	public void testTreeMapWithComparator()
 	{
-		final TreeMap<Object, String> m = new TreeMap<>(new Comparator<Object>()
+		final TreeMap<Object, String> m = new TreeMap<Object, String>(new Comparator<Object>()
 		{
-			@Override
 			public int compare(final Object o1, final Object o2)
 			{
 				return o1.hashCode() - o2.hashCode();
@@ -664,9 +663,8 @@ public class TestCloner extends TestCase
 
 	public void testTreeSetWithComparator()
 	{
-		final TreeSet<Object> set = new TreeSet<>(new Comparator<Object>()
+		final TreeSet<Object> set = new TreeSet<Object>(new Comparator<Object>()
 		{
-			@Override
 			public int compare(final Object o1, final Object o2)
 			{
 				return o1.hashCode() - o2.hashCode();

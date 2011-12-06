@@ -16,7 +16,6 @@ public class F implements IFreezable
 		this.frozen = frozen;
 	}
 
-	@Override
 	public boolean isFrozen()
 	{
 		return frozen;

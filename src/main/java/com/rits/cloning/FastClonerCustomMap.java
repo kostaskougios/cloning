@@ -11,7 +11,6 @@ import java.util.Set;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 {
-	@Override
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final T m = (T) t;
@@ -27,5 +26,4 @@ public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 	}
 
 	protected abstract T getInstance(T t);
-
 }

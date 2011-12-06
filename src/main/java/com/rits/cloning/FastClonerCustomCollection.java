@@ -13,7 +13,6 @@ public abstract class FastClonerCustomCollection<T extends Collection> implement
 {
 	public abstract T getInstance(T o);
 
-	@Override
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final T c = getInstance((T) t);
@@ -25,5 +24,4 @@ public abstract class FastClonerCustomCollection<T extends Collection> implement
 		}
 		return c;
 	}
-
 }
