@@ -16,7 +16,7 @@ public class FastClonerTreeMap implements IFastCloner
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final TreeMap<Object, Object> m = (TreeMap) t;
-		final TreeMap result = new TreeMap();
+		final TreeMap result = new TreeMap(m.comparator());
 		for (final Map.Entry e : m.entrySet())
 		{
 			final Object key = cloner.cloneInternal(e.getKey(), clones);

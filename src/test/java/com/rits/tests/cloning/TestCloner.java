@@ -2,6 +2,7 @@ package com.rits.tests.cloning;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -628,5 +629,68 @@ public class TestCloner extends TestCase
 		assertNotSame(inner, clonedInner);
 		assertNotSame(inner.x, clonedInner.x);
 		assertSame(outer, clonedInner.getOuter());
+	}
+
+	public void testTreeMapWithComparator()
+	{
+		final TreeMap<Object, String> m = new TreeMap<>(new Comparator<Object>()
+		{
+			@Override
+			public int compare(final Object o1, final Object o2)
+			{
+				return o1.hashCode() - o2.hashCode();
+			}
+		});
+		m.put(new Object()
+		{
+			@Override
+			public int hashCode()
+			{
+				return 1;
+			}
+		}, "1");
+		m.put(new Object()
+		{
+			@Override
+			public int hashCode()
+			{
+				return 2;
+			}
+		}, "2");
+
+		final TreeMap<Object, String> clone = cloner.deepClone(m);
+		assertEquals(m, clone);
+	}
+
+	public void testTreeSetWithComparator()
+	{
+		final TreeSet<Object> set = new TreeSet<>(new Comparator<Object>()
+		{
+			@Override
+			public int compare(final Object o1, final Object o2)
+			{
+				return o1.hashCode() - o2.hashCode();
+			}
+		});
+
+		set.add(new Object()
+		{
+			@Override
+			public int hashCode()
+			{
+				return 1;
+			}
+		});
+		set.add(new Object()
+		{
+			@Override
+			public int hashCode()
+			{
+				return 2;
+			}
+		});
+
+		final TreeSet<Object> clone = cloner.deepClone(set);
+		assertEquals(set, clone);
 	}
 }

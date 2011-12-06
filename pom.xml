@@ -9,7 +9,7 @@
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>jar</packaging>
-	<version>1.7.7</version>
+	<version>1.7.8</version>
 	<name>cloning</name>
 
 	<url>http://robust-it.co.uk/clone/</url>
@@ -125,7 +125,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
+			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
