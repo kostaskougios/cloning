@@ -1,7 +1,6 @@
 package com.rits.cloning;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 /**
@@ -15,7 +14,7 @@ public class FastClonerHashSet implements IFastCloner
 	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final HashSet al = (HashSet) t;
-		final HashSet l = new LinkedHashSet();
+		final HashSet l = new HashSet();
 		for (final Object o : al)
 		{
 			final Object cloneInternal = cloner.cloneInternal(o, clones);

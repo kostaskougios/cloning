@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -462,21 +461,6 @@ public class TestCloner extends TestCase
 		for (final Object o : l)
 		{
 			assertTrue(cloned.contains(o));
-		}
-		final Iterator<Object> it1 = l.iterator();
-		final Iterator<Object> it2 = cloned.iterator();
-		while (it1.hasNext())
-		{
-			final Object n1 = it1.next();
-			final Object n2 = it2.next();
-			if (n1 instanceof Calendar)
-			{
-				assertNotSame(n1, n2);
-				assertEquals(n1, n2);
-			} else
-			{
-				assertSame(n1, n2);
-			}
 		}
 	}
 
