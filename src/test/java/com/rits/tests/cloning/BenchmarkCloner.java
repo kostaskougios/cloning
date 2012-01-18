@@ -20,7 +20,7 @@ public class BenchmarkCloner
 	{
 		final long start = System.currentTimeMillis();
 		final Cloner cloner = new Cloner();
-		int j = 100000;
+		int j = 300000;
 		final Calendar gc = Calendar.getInstance();
 		while (j-- > 0)
 		{
@@ -44,6 +44,5 @@ public class BenchmarkCloner
 			cloner.deepClone(m);
 		}
 		System.out.println("dt=" + (System.currentTimeMillis() - start));
-
 	}
 }

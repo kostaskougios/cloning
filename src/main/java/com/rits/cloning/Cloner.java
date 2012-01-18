@@ -48,6 +48,18 @@ public class Cloner
 	private boolean											nullTransient		= false;
 	private boolean											cloneSynthetics		= true;
 
+	public Cloner()
+	{
+		objenesis = new ObjenesisStd();
+		init();
+	}
+
+	public Cloner(final Objenesis objenesis)
+	{
+		this.objenesis = objenesis;
+		init();
+	}
+
 	public boolean isNullTransient()
 	{
 		return nullTransient;
@@ -68,12 +80,6 @@ public class Cloner
 	public void setCloneSynthetics(final boolean cloneSynthetics)
 	{
 		this.cloneSynthetics = cloneSynthetics;
-	}
-
-	public Cloner()
-	{
-		objenesis = new ObjenesisStd();
-		init();
 	}
 
 	private void init()
@@ -103,12 +109,6 @@ public class Cloner
 		final IFastCloner fastCloner = fastCloners.get(c);
 		if (fastCloner != null) return fastCloner.clone(o, this, clones);
 		return null;
-	}
-
-	public Cloner(final Objenesis objenesis)
-	{
-		this.objenesis = objenesis;
-		init();
 	}
 
 	public void registerConstant(final Object o)
@@ -488,10 +488,10 @@ public class Cloner
 	}
 
 	/**
-	 * copies all properties from src to dest. Src and dest can be of different class, provided they contain same field names
+	 * copies all properties from src to dest. Src and dest can be of different class, provided they contain same field names/types
 	 * 
 	 * @param src		the source object
-	 * @param dest		the destination object which must contain as minimul all the fields of src
+	 * @param dest		the destination object which must contain as minimum all the fields of src
 	 */
 	public <T, E extends T> void copyPropertiesOfInheritedClass(final T src, final E dest)
 	{
@@ -542,7 +542,7 @@ public class Cloner
 	{
 		for (final Field field : fields)
 		{
-			field.setAccessible(true);
+			if (!field.isAccessible()) field.setAccessible(true);
 			l.add(field);
 		}
 	}
