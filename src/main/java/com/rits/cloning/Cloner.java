@@ -39,6 +39,7 @@ public class Cloner
 {
 	private final Objenesis									objenesis;
 	private final Set<Class<?>>								ignored				= new HashSet<Class<?>>();
+	private final Set<Class<?>>								ignoredInstanceOf	= new HashSet<Class<?>>();
 	private final Set<Class<?>>								nullInstead			= new HashSet<Class<?>>();
 	private final Map<Class<?>, IFastCloner>				fastCloners			= new HashMap<Class<?>, IFastCloner>();
 	private final Map<Object, Boolean>						ignoredInstances	= new IdentityHashMap<Object, Boolean>();
@@ -218,6 +219,14 @@ public class Cloner
 		for (final Class<?> cl : c)
 		{
 			ignored.add(cl);
+		}
+	}
+
+	public void dontCloneInstanceOf(final Class<?>... c)
+	{
+		for (final Class<?> cl : c)
+		{
+			ignoredInstanceOf.add(cl);
 		}
 	}
 
@@ -415,6 +424,10 @@ public class Cloner
 		// skip cloning ignored classes
 		if (nullInstead.contains(clz)) return null;
 		if (ignored.contains(clz)) return o;
+		for (final Class<?> iClz : ignoredInstanceOf)
+		{
+			if (iClz.isAssignableFrom(clz)) return o;
+		}
 		if (isImmutable(clz)) return o;
 		if (o instanceof IFreezable)
 		{
@@ -475,7 +488,8 @@ public class Cloner
 				{
 					final Object fieldObject = field.get(o);
 					final boolean shouldClone = cloneSynthetics || (!cloneSynthetics && !field.isSynthetic());
-					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
+					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject)
+						: fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpClonedClasses && fieldObjectClone != fieldObject)
 					{
@@ -542,7 +556,10 @@ public class Cloner
 	{
 		for (final Field field : fields)
 		{
-			if (!field.isAccessible()) field.setAccessible(true);
+			if (!field.isAccessible())
+			{
+				field.setAccessible(true);
+			}
 			l.add(field);
 		}
 	}

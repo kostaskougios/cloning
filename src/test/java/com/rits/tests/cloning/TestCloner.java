@@ -63,6 +63,18 @@ public class TestCloner extends TestCase
 	{
 	}
 
+	public void testIgnoreInstanceOf()
+	{
+		final Cloner cloner = new Cloner();
+		cloner.dontCloneInstanceOf(A.class);
+
+		final A a = new A()
+		{
+		};
+		assertNotSame(a.getClass(), A.class);
+		assertSame(a, cloner.deepClone(a));
+	}
+
 	public void testImmutableSubclassNotEnabled()
 	{
 		final BTestImmutableSubclass a = new BTestImmutableSubclass();
