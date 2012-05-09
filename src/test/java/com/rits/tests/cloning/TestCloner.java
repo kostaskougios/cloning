@@ -63,6 +63,15 @@ public class TestCloner extends TestCase
 	{
 	}
 
+	public void testIssue7()
+	{
+		HashMap<Object, Object> source = new HashMap<Object, Object>();
+		source.put("string", "string");
+		source.put("array", new Integer[] { 1, 2, 3 });
+		HashMap<Object, Object> sc = cloner.shallowClone(source);
+		assertEquals("string", sc.get("string"));
+	}
+
 	public void testIgnoreInstanceOf()
 	{
 		final Cloner cloner = new Cloner();

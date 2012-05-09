@@ -455,7 +455,7 @@ public class Cloner
 		{
 			final int length = Array.getLength(o);
 			final T newInstance = (T) Array.newInstance(clz.getComponentType(), length);
-			clones.put(o, newInstance);
+			if (clones != null) clones.put(o, newInstance);
 			for (int i = 0; i < length; i++)
 			{
 				final Object v = Array.get(o, i);
@@ -488,8 +488,7 @@ public class Cloner
 				{
 					final Object fieldObject = field.get(o);
 					final boolean shouldClone = cloneSynthetics || (!cloneSynthetics && !field.isSynthetic());
-					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject)
-						: fieldObject;
+					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpClonedClasses && fieldObjectClone != fieldObject)
 					{
