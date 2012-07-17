@@ -23,9 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import org.objenesis.Objenesis;
-import org.objenesis.ObjenesisStd;
-
 /**
  * Cloner: deep clone objects.
  * 
@@ -37,7 +34,7 @@ import org.objenesis.ObjenesisStd;
  */
 public class Cloner
 {
-	private final Objenesis									objenesis;
+	private IInstantiationStrategy							instantiationStrategy;
 	private final Set<Class<?>>								ignored				= new HashSet<Class<?>>();
 	private final Set<Class<?>>								ignoredInstanceOf	= new HashSet<Class<?>>();
 	private final Set<Class<?>>								nullInstead			= new HashSet<Class<?>>();
@@ -51,13 +48,13 @@ public class Cloner
 
 	public Cloner()
 	{
-		objenesis = new ObjenesisStd();
+		this.instantiationStrategy = ObjenesisInstantiationStrategy.getInstance();
 		init();
 	}
 
-	public Cloner(final Objenesis objenesis)
+	public Cloner(IInstantiationStrategy instantiationStrategy)
 	{
-		this.objenesis = objenesis;
+		this.instantiationStrategy = instantiationStrategy;
 		init();
 	}
 
@@ -285,10 +282,9 @@ public class Cloner
 	 * @param c			the class
 	 * @return			a new instance of c
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> T newInstance(final Class<T> c)
+	protected <T> T newInstance(final Class<T> c)
 	{
-		return (T) objenesis.newInstance(c);
+		return instantiationStrategy.newInstance(c);
 	}
 
 	@SuppressWarnings("unchecked")

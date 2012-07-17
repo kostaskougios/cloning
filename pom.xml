@@ -9,7 +9,7 @@
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>jar</packaging>
-	<version>1.8.1</version>
+	<version>1.8.2</version>
 	<name>cloning</name>
 
 	<url>http://robust-it.co.uk/clone/</url>
