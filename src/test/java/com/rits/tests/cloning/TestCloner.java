@@ -696,4 +696,12 @@ public class TestCloner extends TestCase
 		final TreeSet<Object> clone = cloner.deepClone(set);
 		assertEquals(set, clone);
 	}
+
+	public void testEnumIssue9()
+	{
+		TestEnum original = TestEnum.A;
+		assertTrue(original.getClass().isEnum());
+		TestEnum clone = cloner.deepClone(original);
+		assertSame(clone, original);
+	}
 }
