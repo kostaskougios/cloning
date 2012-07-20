@@ -12,7 +12,7 @@
 	<version>1.8.2</version>
 	<name>cloning</name>
 
-	<url>http://robust-it.co.uk/clone/</url>
+	<url>https://code.google.com/p/cloning/</url>
 	<description><![CDATA[
 		The cloning library is a small, open source (Apache
 		licensed) Java library which deep-clones objects. The
@@ -42,8 +42,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<scm>
-		<connection>scm:svn:http://cloning.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://cloning.googlecode.com/svn/trunk</developerConnection>
+		<connection>scm:git:https://kostas.kougios@code.google.com/p/cloning/</connection>
+		<developerConnection>scm:git:https://kostas.kougios@code.google.com/p/cloning/ </developerConnection>
 		<url>https://code.google.com/p/cloning/source/browse/</url>
 	</scm>
 	<issueManagement>
