@@ -31,4 +31,5 @@ to deploy to sonatype:
 
 mvn -P sonatype-deploy -Dgpg.passphrase=X
 
-where X=your gpg password 
+where X=your gpg password
+ 
