@@ -560,9 +560,9 @@ public class Cloner
 	}
 
 	/**
-	 * reflection utils
+	 * reflection utils, override this to choose which fields to clone
 	 */
-	private List<Field> allFields(final Class<?> c)
+	protected List<Field> allFields(final Class<?> c)
 	{
 		List<Field> l = fieldsCache.get(c);
 		if (l == null)
