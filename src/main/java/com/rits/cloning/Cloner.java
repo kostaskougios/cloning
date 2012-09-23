@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  */
 public class Cloner
 {
-	private IInstantiationStrategy							instantiationStrategy;
+	private final IInstantiationStrategy					instantiationStrategy;
 	private final Set<Class<?>>								ignored				= new HashSet<Class<?>>();
 	private final Set<Class<?>>								ignoredInstanceOf	= new HashSet<Class<?>>();
 	private final Set<Class<?>>								nullInstead			= new HashSet<Class<?>>();
@@ -52,7 +52,7 @@ public class Cloner
 		init();
 	}
 
-	public Cloner(IInstantiationStrategy instantiationStrategy)
+	public Cloner(final IInstantiationStrategy instantiationStrategy)
 	{
 		this.instantiationStrategy = instantiationStrategy;
 		init();
@@ -371,7 +371,8 @@ public class Cloner
 	}
 
 	// caches immutables for quick reference
-	private final ConcurrentHashMap<Class<?>, Boolean>	immutables	= new ConcurrentHashMap<Class<?>, Boolean>();
+	private final ConcurrentHashMap<Class<?>, Boolean>	immutables				= new ConcurrentHashMap<Class<?>, Boolean>();
+	private boolean										cloneAnonymousParent	= true;
 
 	private boolean isImmutable(final Class<?> clz)
 	{
@@ -451,7 +452,10 @@ public class Cloner
 		{
 			final int length = Array.getLength(o);
 			final T newInstance = (T) Array.newInstance(clz.getComponentType(), length);
-			if (clones != null) clones.put(o, newInstance);
+			if (clones != null)
+			{
+				clones.put(o, newInstance);
+			}
 			for (int i = 0; i < length; i++)
 			{
 				final Object v = Array.get(o, i);
@@ -483,7 +487,7 @@ public class Cloner
 				} else
 				{
 					final Object fieldObject = field.get(o);
-					final boolean shouldClone = cloneSynthetics || (!cloneSynthetics && !field.isSynthetic());
+					final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
 					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpClonedClasses && fieldObjectClone != fieldObject)
@@ -494,6 +498,15 @@ public class Cloner
 			}
 		}
 		return newInstance;
+	}
+
+	/**
+	 * @param field
+	 * @return
+	 */
+	private boolean isAnonymousParent(final Field field)
+	{
+		return "this$0".equals(field.getName());
 	}
 
 	/**
@@ -603,5 +616,18 @@ public class Cloner
 	public void setCloningEnabled(final boolean cloningEnabled)
 	{
 		this.cloningEnabled = cloningEnabled;
+	}
+
+	/**
+	 * if false, anonymous classes parent class won't be cloned. Default is true
+	 */
+	public void setCloneAnonymousParent(final boolean cloneAnonymousParent)
+	{
+		this.cloneAnonymousParent = cloneAnonymousParent;
+	}
+
+	public boolean isCloneAnonymousParent()
+	{
+		return cloneAnonymousParent;
 	}
 }
