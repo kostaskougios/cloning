@@ -5,13 +5,11 @@
 		<artifactId>oss-parent</artifactId>
 		<version>5</version>
 	</parent>
-
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
-	<packaging>jar</packaging>
-	<version>1.8.3</version>
+	<packaging>bundle</packaging>
+	<version>1.8.4</version>
 	<name>cloning</name>
-
 	<url>https://code.google.com/p/cloning/</url>
 	<description><![CDATA[
 		The cloning library is a small, open source (Apache
@@ -107,7 +105,9 @@
 				<executions>
 					<execution>
 						<phase>package</phase>
-						<goals><goal>single</goal></goals>
+						<goals>
+							<goal>single</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
@@ -118,6 +118,12 @@
 						<descriptorRef>project</descriptorRef>
 					</descriptorRefs>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>
