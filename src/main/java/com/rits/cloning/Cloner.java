@@ -374,13 +374,36 @@ public class Cloner
 	private final ConcurrentHashMap<Class<?>, Boolean>	immutables				= new ConcurrentHashMap<Class<?>, Boolean>();
 	private boolean										cloneAnonymousParent	= true;
 
+	/**
+	 * override this to decide if a class is immutable. Immutable classes are not cloned.
+	 * 
+	 * @param clz		the class under check
+	 * @return			true to mark clz as immutable and skip cloning it
+	 */
+	protected boolean considerImmutable(final Class<?> clz)
+	{
+		return false;
+	}
+
+	protected Class<?> getImmutableAnnotation()
+	{
+		return Immutable.class;
+	}
+
+	/**
+	 * decides if a class is to be considered immutable or not
+	 * 
+	 * @param clz		the class under check
+	 * @return			true if the clz is considered immutable
+	 */
 	private boolean isImmutable(final Class<?> clz)
 	{
-		final Boolean b = immutables.get(clz);
-		if (b != null && b) return true;
+		if (immutables.contains(clz) || considerImmutable(clz)) return true;
+
+		final Class<?> immutableAnnotation = getImmutableAnnotation();
 		for (final Annotation annotation : clz.getDeclaredAnnotations())
 		{
-			if (annotation.annotationType() == Immutable.class)
+			if (annotation.annotationType() == immutableAnnotation)
 			{
 				immutables.put(clz, Boolean.TRUE);
 				return true;

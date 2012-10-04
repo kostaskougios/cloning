@@ -1,5 +1,10 @@
 package com.rits.tests.cloning;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -36,6 +41,48 @@ public class TestCloner extends TestCase
 		cloner.setDumpClonedClasses(false);
 	}
 
+	@Target(TYPE)
+	@Retention(RUNTIME)
+	static private @interface MyImmutable
+	{
+
+	}
+
+	@MyImmutable
+	static private class MyAX
+	{
+	}
+
+	public void testCustomAnnotation()
+	{
+		final Cloner cloner = new Cloner()
+		{
+			@Override
+			protected Class<?> getImmutableAnnotation()
+			{
+				return MyImmutable.class;
+			}
+		};
+		final MyAX o = new MyAX();
+		final MyAX c = cloner.deepClone(o);
+		assertSame(o, c);
+	}
+
+	public void testConsiderImmutable()
+	{
+		final Cloner cloner = new Cloner()
+		{
+			@Override
+			protected boolean considerImmutable(final Class<?> clz)
+			{
+				return clz == Object.class;
+			}
+		};
+		final Object o = new Object();
+		final Object c = cloner.deepClone(o);
+		assertSame(o, c);
+	}
+
 	class X
 	{
 		private X(int x)
@@ -65,10 +112,10 @@ public class TestCloner extends TestCase
 
 	public void testIssue7()
 	{
-		HashMap<Object, Object> source = new HashMap<Object, Object>();
+		final HashMap<Object, Object> source = new HashMap<Object, Object>();
 		source.put("string", "string");
 		source.put("array", new Integer[] { 1, 2, 3 });
-		HashMap<Object, Object> sc = cloner.shallowClone(source);
+		final HashMap<Object, Object> sc = cloner.shallowClone(source);
 		assertEquals("string", sc.get("string"));
 	}
 
@@ -699,9 +746,9 @@ public class TestCloner extends TestCase
 
 	public void testEnumIssue9()
 	{
-		TestEnum original = TestEnum.A;
+		final TestEnum original = TestEnum.A;
 		assertTrue(original.getClass().isEnum());
-		TestEnum clone = cloner.deepClone(original);
+		final TestEnum clone = cloner.deepClone(original);
 		assertSame(clone, original);
 	}
 }
