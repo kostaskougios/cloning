@@ -227,6 +227,11 @@ public class Cloner
 		}
 	}
 
+	public void setDontCloneInstanceOf(final Class<?>... c)
+	{
+		dontCloneInstanceOf(c);
+	}
+
 	/**
 	 * instead of cloning these classes will set the field to null
 	 * 
