@@ -29,7 +29,7 @@ public class TestClonerThreadSafety extends TestCase
 	public void testCloner()
 	{
 		final Random r = new Random();
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < 10000; i++)
 		{
 			final Calendar cal = Calendar.getInstance();
 			final Calendar clone = cloner.deepClone(cal);
@@ -80,7 +80,7 @@ public class TestClonerThreadSafety extends TestCase
 	public static Test suite()
 	{
 		final TestSuite testSuite = new TestSuite();
-		for (int i = 0; i < 40; i++)
+		for (int i = 0; i < 80; i++)
 		{
 			testSuite.addTest(new ActiveTestSuite(TestClonerThreadSafety.class));
 		}
