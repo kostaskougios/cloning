@@ -188,7 +188,6 @@ public class Cloner
 				final int mods = field.getModifiers();
 				if (Modifier.isStatic(mods) && !field.getType().isPrimitive())
 				{
-					//					System.out.println(c + " . " + field.getName());
 					registerConstant(c, field.getName());
 				}
 			}
@@ -531,10 +530,6 @@ public class Cloner
 		return newInstance;
 	}
 
-	/**
-	 * @param field
-	 * @return
-	 */
 	private boolean isAnonymousParent(final Field field)
 	{
 		return "this$0".equals(field.getName());
