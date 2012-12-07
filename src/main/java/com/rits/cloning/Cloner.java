@@ -403,7 +403,9 @@ public class Cloner
 	 */
 	private boolean isImmutable(final Class<?> clz)
 	{
-		if (immutables.contains(clz) || considerImmutable(clz)) return true;
+		final Boolean isIm = immutables.get(clz);
+		if (isIm != null) return isIm;
+		if (considerImmutable(clz)) return true;
 
 		final Class<?> immutableAnnotation = getImmutableAnnotation();
 		for (final Annotation annotation : clz.getDeclaredAnnotations())
@@ -431,6 +433,7 @@ public class Cloner
 			}
 			c = c.getSuperclass();
 		}
+		immutables.put(clz, Boolean.FALSE);
 		return false;
 	}
 

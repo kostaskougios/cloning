@@ -141,15 +141,15 @@ public class TestCloner extends TestCase
 	public void testImmutableSubclass()
 	{
 		final ATestImmutableSubclass a = new ATestImmutableSubclass();
-		final ATestImmutable ca = cloner.deepClone(a);
-		assertSame(a, ca);
+		assertSame(a, cloner.deepClone(a));
+		assertSame(a, cloner.deepClone(a));
 	}
 
 	public void testImmutable()
 	{
 		final ATestImmutable a = new ATestImmutable();
-		final ATestImmutable ca = cloner.deepClone(a);
-		assertSame(a, ca);
+		assertSame(a, cloner.deepClone(a));
+		assertSame(a, cloner.deepClone(a));
 	}
 
 	/**
