@@ -1,26 +1,5 @@
 package com.rits.tests.cloning;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import junit.framework.TestCase;
-
 import com.rits.cloning.Cloner;
 import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.TestCloner.SynthOuter.Inner;
@@ -28,15 +7,24 @@ import com.rits.tests.cloning.domain.A;
 import com.rits.tests.cloning.domain.B;
 import com.rits.tests.cloning.domain.F;
 import com.rits.tests.cloning.domain.G;
+import junit.framework.TestCase;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.*;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author kostantinos.kougios
- *
- * 18 Sep 2008
+ *         <p/>
+ *         18 Sep 2008
  */
 public class TestCloner extends TestCase
 {
-	private final Cloner	cloner	= new Cloner();
+	private final Cloner cloner = new Cloner();
+
 	{
 		cloner.setDumpClonedClasses(false);
 	}
@@ -114,7 +102,7 @@ public class TestCloner extends TestCase
 	{
 		final HashMap<Object, Object> source = new HashMap<Object, Object>();
 		source.put("string", "string");
-		source.put("array", new Integer[] { 1, 2, 3 });
+		source.put("array", new Integer[]{1, 2, 3});
 		final HashMap<Object, Object> sc = cloner.shallowClone(source);
 		assertEquals("string", sc.get("string"));
 	}
@@ -154,7 +142,7 @@ public class TestCloner extends TestCase
 
 	/**
 	 * tests if it happens that in the deep-graph of the cloned objects,
-	 * if a reference to the same object exists twice, the cloned object 
+	 * if a reference to the same object exists twice, the cloned object
 	 * will have only 1 clone and references to this clone.
 	 */
 	public void testCloningOfSameObject()
@@ -163,7 +151,7 @@ public class TestCloner extends TestCase
 		final Object o2 = new Object();
 		class OO
 		{
-			Object	o1, o2, o3, o4;
+			Object o1, o2, o3, o4;
 		}
 		final OO oo = new OO();
 		oo.o1 = o1;
@@ -213,14 +201,14 @@ public class TestCloner extends TestCase
 	 */
 	public void testCloneArrays()
 	{
-		final int[] ia = { 1, 2, 3 };
+		final int[] ia = {1, 2, 3};
 		final int[] cloned = cloner.deepClone(ia);
 		assertEquals(ia.length, cloned.length);
 		for (int i = 0; i < ia.length; i++)
 		{
 			assertEquals(ia[i], cloned[i]);
 		}
-		final double[] da = { 1, 2, 3 };
+		final double[] da = {1, 2, 3};
 		final double[] dcloned = cloner.deepClone(da);
 		assertEquals(da.length, dcloned.length);
 		for (int i = 0; i < ia.length; i++)
@@ -231,9 +219,9 @@ public class TestCloner extends TestCase
 
 	private class Simple
 	{
-		private int		x	= 1;
-		private String	s	= "simple";
-		private Complex	complex;
+		private int x = 1;
+		private String s = "simple";
+		private Complex complex;
 
 		public Complex getComplex()
 		{
@@ -298,9 +286,9 @@ public class TestCloner extends TestCase
 
 	protected class Complex
 	{
-		private int					x	= 1;
-		private String				s	= "complex";
-		private final List<Simple>	l	= new ArrayList<Simple>();
+		private int x = 1;
+		private String s = "complex";
+		private final List<Simple> l = new ArrayList<Simple>();
 
 		public Complex()
 		{
@@ -597,7 +585,7 @@ public class TestCloner extends TestCase
 
 	public void testCopyPropertiesArrayPrimitive()
 	{
-		final int[] src = new int[] { 5, 6, 7 };
+		final int[] src = new int[]{5, 6, 7};
 		final int[] dest = new int[3];
 		cloner.copyPropertiesOfInheritedClass(src, dest);
 		assertEquals(src[0], dest[0]);
@@ -607,7 +595,7 @@ public class TestCloner extends TestCase
 
 	public void testCopyPropertiesArray()
 	{
-		final Object[] src = new Object[] { new Integer(5), new Float(8.5f), new Double(3.5d) };
+		final Object[] src = new Object[]{new Integer(5), new Float(8.5f), new Double(3.5d)};
 		final Object[] dest = new Object[3];
 		cloner.copyPropertiesOfInheritedClass(src, dest);
 		assertEquals(src[0], dest[0]);
@@ -662,7 +650,7 @@ public class TestCloner extends TestCase
 
 		class Inner
 		{
-			Object	x	= new Object();
+			Object x = new Object();
 
 			public SynthOuter getOuter()
 			{
@@ -750,5 +738,16 @@ public class TestCloner extends TestCase
 		assertTrue(original.getClass().isEnum());
 		final TestEnum clone = cloner.deepClone(original);
 		assertSame(clone, original);
+	}
+
+	public void testDate()
+	{
+		Date original = new Date();
+		Cloner cloner = new Cloner();
+		cloner.setNullTransient(true);
+		Date clone = cloner.deepClone(original);
+
+		// I expect this to be true, but is is false.
+		assertEquals(0, clone.getTime());
 	}
 }
