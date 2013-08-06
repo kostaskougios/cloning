@@ -8,43 +8,43 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
  * Cloner: deep clone objects.
- * 
+ * <p/>
  * This class is thread safe. One instance can be used by multiple threads on the same time.
- * 
- * @author kostantinos.kougios
  *
- * 18 Sep 2008
+ * @author kostantinos.kougios
+ *         <p/>
+ *         18 Sep 2008
  */
 public class Cloner
 {
-	private final IInstantiationStrategy					instantiationStrategy;
-	private final Set<Class<?>>								ignored				= new HashSet<Class<?>>();
-	private final Set<Class<?>>								ignoredInstanceOf	= new HashSet<Class<?>>();
-	private final Set<Class<?>>								nullInstead			= new HashSet<Class<?>>();
-	private final Map<Class<?>, IFastCloner>				fastCloners			= new HashMap<Class<?>, IFastCloner>();
-	private final Map<Object, Boolean>						ignoredInstances	= new IdentityHashMap<Object, Boolean>();
-	private final ConcurrentHashMap<Class<?>, List<Field>>	fieldsCache			= new ConcurrentHashMap<Class<?>, List<Field>>();
-	private boolean											dumpClonedClasses	= false;
-	private boolean											cloningEnabled		= true;
-	private boolean											nullTransient		= false;
-	private boolean											cloneSynthetics		= true;
+	private final IInstantiationStrategy instantiationStrategy;
+	private final Set<Class<?>> ignored = new HashSet<Class<?>>();
+	private final Set<Class<?>> ignoredInstanceOf = new HashSet<Class<?>>();
+	private final Set<Class<?>> nullInstead = new HashSet<Class<?>>();
+	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<Class<?>, IFastCloner>();
+	private final Map<Object, Boolean> ignoredInstances = new IdentityHashMap<Object, Boolean>();
+	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<Class<?>, List<Field>>();
+
+	public IDumpCloned getDumpCloned()
+	{
+		return dumpCloned;
+	}
+
+	public void setDumpCloned(IDumpCloned dumpCloned)
+	{
+		this.dumpCloned = dumpCloned;
+	}
+
+	private IDumpCloned dumpCloned = null;
+	private boolean cloningEnabled = true;
+	private boolean nullTransient = false;
+	private boolean cloneSynthetics = true;
 
 	public Cloner()
 	{
@@ -65,10 +65,10 @@ public class Cloner
 
 	/**
 	 * this makes the cloner to set a transient field to null upon cloning.
-	 * 
+	 * <p/>
 	 * NOTE: primitive types can't be nulled. Their value will be set to default, i.e. 0 for int
-	 * 
-	 * @param nullTransient		true for transient fields to be nulled
+	 *
+	 * @param nullTransient true for transient fields to be nulled
 	 */
 	public void setNullTransient(final boolean nullTransient)
 	{
@@ -172,11 +172,11 @@ public class Cloner
 	/**
 	 * registers all static fields of these classes. Those static fields won't be cloned when an instance
 	 * of the class is cloned.
-	 * 
+	 * <p/>
 	 * This is useful i.e. when a static field object is added into maps or sets. At that point, there is no
-	 * way for the cloner to know that it was static except if it is registered. 
-	 * 
-	 * @param classes		array of classes
+	 * way for the cloner to know that it was static except if it is registered.
+	 *
+	 * @param classes array of classes
 	 */
 	public void registerStaticFields(final Class<?>... classes)
 	{
@@ -196,7 +196,8 @@ public class Cloner
 
 	/**
 	 * spring framework friendly version of registerStaticFields
-	 * @param set		a set of classes which will be scanned for static fields
+	 *
+	 * @param set a set of classes which will be scanned for static fields
 	 */
 	public void setExtraStaticFields(final Set<Class<?>> set)
 	{
@@ -205,10 +206,10 @@ public class Cloner
 
 	/**
 	 * instances of classes that shouldn't be cloned can be registered using this method.
-	 * 
-	 * @param c		The class that shouldn't be cloned. That is, whenever a deep clone for
-	 * 				an object is created and c is encountered, the object instance of c will
-	 * 				be added to the clone.
+	 *
+	 * @param c The class that shouldn't be cloned. That is, whenever a deep clone for
+	 *          an object is created and c is encountered, the object instance of c will
+	 *          be added to the clone.
 	 */
 	public void dontClone(final Class<?>... c)
 	{
@@ -233,8 +234,8 @@ public class Cloner
 
 	/**
 	 * instead of cloning these classes will set the field to null
-	 * 
-	 * @param c		the classes to nullify during cloning
+	 *
+	 * @param c the classes to nullify during cloning
 	 */
 	public void nullInsteadOfClone(final Class<?>... c)
 	{
@@ -254,8 +255,8 @@ public class Cloner
 
 	/**
 	 * registers an immutable class. Immutable classes are not cloned.
-	 * 
-	 * @param c			the immutable class
+	 *
+	 * @param c the immutable class
 	 */
 	public void registerImmutable(final Class<?>... c)
 	{
@@ -281,10 +282,10 @@ public class Cloner
 
 	/**
 	 * creates a new instance of c. Override to provide your own implementation
-	 * 
-	 * @param <T>		the type of c
-	 * @param c			the class
-	 * @return			a new instance of c
+	 *
+	 * @param <T> the type of c
+	 * @param c   the class
+	 * @return a new instance of c
 	 */
 	protected <T> T newInstance(final Class<T> c)
 	{
@@ -308,18 +309,18 @@ public class Cloner
 
 	/**
 	 * deep clones "o".
-	 * 
-	 * @param <T>		the type of "o"
-	 * @param o			the object to be deep-cloned
-	 * @return			a deep-clone of "o".
+	 *
+	 * @param <T> the type of "o"
+	 * @param o   the object to be deep-cloned
+	 * @return a deep-clone of "o".
 	 */
 	public <T> T deepClone(final T o)
 	{
 		if (o == null) return null;
 		if (!cloningEnabled) return o;
-		if (dumpClonedClasses)
+		if (dumpCloned != null)
 		{
-			System.out.println("start>" + o.getClass());
+			dumpCloned.startCloning(o.getClass());
 		}
 		final Map<Object, Object> clones = new IdentityHashMap<Object, Object>(16);
 		try
@@ -335,9 +336,9 @@ public class Cloner
 	{
 		if (o == null) return null;
 		if (!cloningEnabled) return o;
-		if (dumpClonedClasses)
+		if (dumpCloned != null)
 		{
-			System.out.println("start>" + o.getClass());
+			dumpCloned.startCloning(o.getClass());
 		}
 		final Map<Object, Object> clones = new IdentityHashMap<Object, Object>(16);
 		for (final Object dc : dontCloneThese)
@@ -356,10 +357,10 @@ public class Cloner
 	/**
 	 * shallow clones "o". This means that if c=shallowClone(o) then
 	 * c!=o. Any change to c won't affect o.
-	 * 
-	 * @param <T>		the type of o
-	 * @param o			the object to be shallow-cloned
-	 * @return			a shallow clone of "o"
+	 *
+	 * @param <T> the type of o
+	 * @param o   the object to be shallow-cloned
+	 * @return a shallow clone of "o"
 	 */
 	public <T> T shallowClone(final T o)
 	{
@@ -375,14 +376,14 @@ public class Cloner
 	}
 
 	// caches immutables for quick reference
-	private final ConcurrentHashMap<Class<?>, Boolean>	immutables				= new ConcurrentHashMap<Class<?>, Boolean>();
-	private boolean										cloneAnonymousParent	= true;
+	private final ConcurrentHashMap<Class<?>, Boolean> immutables = new ConcurrentHashMap<Class<?>, Boolean>();
+	private boolean cloneAnonymousParent = true;
 
 	/**
 	 * override this to decide if a class is immutable. Immutable classes are not cloned.
-	 * 
-	 * @param clz		the class under check
-	 * @return			true to mark clz as immutable and skip cloning it
+	 *
+	 * @param clz the class under check
+	 * @return true to mark clz as immutable and skip cloning it
 	 */
 	protected boolean considerImmutable(final Class<?> clz)
 	{
@@ -396,9 +397,9 @@ public class Cloner
 
 	/**
 	 * decides if a class is to be considered immutable or not
-	 * 
-	 * @param clz		the class under check
-	 * @return			true if the clz is considered immutable
+	 *
+	 * @param clz the class under check
+	 * @return true if the clz is considered immutable
 	 */
 	private boolean isImmutable(final Class<?> clz)
 	{
@@ -474,9 +475,9 @@ public class Cloner
 			return (T) fastClone;
 		}
 
-		if (dumpClonedClasses)
+		if (dumpCloned != null)
 		{
-			System.out.println("clone>" + clz);
+			dumpCloned.startCloning(o.getClass());
 		}
 		if (clz.isArray())
 		{
@@ -520,9 +521,9 @@ public class Cloner
 					final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
 					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
-					if (dumpClonedClasses && fieldObjectClone != fieldObject)
+					if (dumpCloned != null && fieldObjectClone != fieldObject)
 					{
-						System.out.println("cloned field>" + field + "  -- of class " + o.getClass());
+						dumpCloned.cloning(field, o.getClass());
 					}
 				}
 			}
@@ -537,9 +538,9 @@ public class Cloner
 
 	/**
 	 * copies all properties from src to dest. Src and dest can be of different class, provided they contain same field names/types
-	 * 
-	 * @param src		the source object
-	 * @param dest		the destination object which must contain as minimum all the fields of src
+	 *
+	 * @param src  the source object
+	 * @param dest the destination object which must contain as minimum all the fields of src
 	 */
 	public <T, E extends T> void copyPropertiesOfInheritedClass(final T src, final E dest)
 	{
@@ -549,7 +550,8 @@ public class Cloner
 		final Class<? extends Object> destClz = dest.getClass();
 		if (srcClz.isArray())
 		{
-			if (!destClz.isArray()) throw new IllegalArgumentException("can't copy from array to non-array class " + destClz);
+			if (!destClz.isArray())
+				throw new IllegalArgumentException("can't copy from array to non-array class " + destClz);
 			final int length = Array.getLength(src);
 			for (int i = 0; i < length; i++)
 			{
@@ -621,17 +623,31 @@ public class Cloner
 
 	public boolean isDumpClonedClasses()
 	{
-		return dumpClonedClasses;
+		return dumpCloned != null;
 	}
 
 	/**
 	 * will println() all cloned classes. Useful for debugging only.
-	 * 
-	 * @param dumpClonedClasses			true to enable printing all cloned classes
+	 *
+	 * @param dumpClonedClasses true to enable printing all cloned classes
 	 */
 	public void setDumpClonedClasses(final boolean dumpClonedClasses)
 	{
-		this.dumpClonedClasses = dumpClonedClasses;
+		if (dumpClonedClasses)
+		{
+			dumpCloned = new IDumpCloned()
+			{
+				public void startCloning(Class<?> clz)
+				{
+					System.out.println("clone>" + clz);
+				}
+
+				public void cloning(Field field, Class<?> clz)
+				{
+					System.out.println("cloned field>" + field + "  -- of class " + clz);
+				}
+			};
+		} else dumpCloned = null;
 	}
 
 	public boolean isCloningEnabled()
