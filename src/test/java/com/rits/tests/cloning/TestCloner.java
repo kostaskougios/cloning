@@ -41,6 +41,15 @@ public class TestCloner extends TestCase
 	{
 	}
 
+	public void testCloneEnumInMapIssue20()
+	{
+		Map<Integer, TestEnum> m = new HashMap<Integer, TestEnum>();
+		m.put(1, TestEnum.A);
+		m.put(2, TestEnum.B);
+		m.put(3, TestEnum.C);
+		cloner.deepClone(m);
+	}
+
 	public void testCustomAnnotation()
 	{
 		final Cloner cloner = new Cloner()
