@@ -47,7 +47,11 @@ public class TestCloner extends TestCase
 		m.put(1, TestEnum.A);
 		m.put(2, TestEnum.B);
 		m.put(3, TestEnum.C);
-		cloner.deepClone(m);
+		Map<Integer, TestEnum> clone = cloner.deepClone(m);
+
+		assertSame(clone.get(1), TestEnum.A);
+		assertSame(clone.get(2), TestEnum.B);
+		assertSame(clone.get(3), TestEnum.C);
 	}
 
 	public void testCustomAnnotation()
