@@ -748,7 +748,6 @@ public class TestCloner extends TestCase
 	public void testEnumIssue9()
 	{
 		final TestEnum original = TestEnum.A;
-		assertTrue(original.getClass().isEnum());
 		final TestEnum clone = cloner.deepClone(original);
 		assertSame(clone, original);
 	}

@@ -447,8 +447,8 @@ public class Cloner
 		if (o == null) return null;
 		if (o == this) return null;
 		if (ignoredInstances.containsKey(o)) return o;
+		if (o instanceof Enum) return o;
 		final Class<T> clz = (Class<T>) o.getClass();
-		if (clz.isEnum()) return o;
 		// skip cloning ignored classes
 		if (nullInstead.contains(clz)) return null;
 		if (ignored.contains(clz)) return o;
