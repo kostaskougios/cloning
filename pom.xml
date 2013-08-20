@@ -6,31 +6,31 @@
         <artifactId>oss-parent</artifactId>
         <version>5</version>
     </parent>
-    <groupId>uk.com.robust-it</groupId>
+    <groupId>com.rits</groupId>
     <artifactId>cloning</artifactId>
     <packaging>bundle</packaging>
     <version>1.9.1-SNAPSHOT</version>
     <name>cloning</name>
     <url>https://code.google.com/p/cloning/</url>
     <description><![CDATA[
-		The cloning library is a small, open source (Apache
-		licensed) Java library which deep-clones objects. The
-		objects do not have to implement the Cloneable
-		interface. Effectivelly, this library can clone ANY
-		Java object. It can be used i.e. in cache
-		implementations, if you don't want the cached object
-		to be modified or whenever you want to create a deep
-		copy of an object.
+                The cloning library is a small, open source (Apache
+                licensed) Java library which deep-clones objects. The
+                objects do not have to implement the Cloneable
+                interface. Effectively, this library can clone ANY
+                Java object. It can be used i.e. in cache
+                implementations, if you don't want the cached object
+                to be modified or whenever you want to create a deep
+                copy of an object.
 
-		Sample usage:
+                Sample usage:
 
-		You can create a single instance of cloner and use it throughout your application. i.e.
-		Cloner cloner=new Cloner();
-		...
-		cloner.deepClone(o);
+                You can create a single instance of cloner and use it throughout your application. i.e.
+                Cloner cloner=new Cloner();
+                ...
+                cloner.deepClone(o);
 
-		Please check http://robust-it.co.uk/clone/ for more examples (spring integration, immutable objects etc)
-	]]></description>
+                Please check http://robust-it.co.uk/clone/ for more examples (spring integration, immutable objects etc)
+        ]]></description>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -53,7 +53,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -61,7 +61,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.15</version>
                 <configuration>
                     <includes>
                         <include>**/Test*.java</include>
@@ -70,7 +70,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -82,7 +82,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
+                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -94,7 +94,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-repository-plugin</artifactId>
@@ -102,7 +102,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <version>2.4.0</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
@@ -132,13 +132,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
         </dependency>
     </dependencies>
     <profiles>
@@ -167,4 +167,4 @@
             </build>
         </profile>
     </profiles>
-</project>
+</project> 

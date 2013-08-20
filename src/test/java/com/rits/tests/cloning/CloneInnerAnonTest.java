@@ -1,24 +1,23 @@
 package com.rits.tests.cloning;
 
-import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertSame;
-
+import com.rits.cloning.Cloner;
 import org.junit.Test;
 
-import com.rits.cloning.Cloner;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 /**
  * @author kostantinos.kougios
- *
- * 23 Sep 2012
+ *         <p/>
+ *         23 Sep 2012
  */
 public class CloneInnerAnonTest
 {
 	class TestInner
 	{
-		public Object				o		= new Object();
+		public Object o = new Object();
 
-		public CloneInnerAnonTest	parent	= CloneInnerAnonTest.this;
+		public CloneInnerAnonTest parent = CloneInnerAnonTest.this;
 
 		public CloneInnerAnonTest getParent()
 		{
