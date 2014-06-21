@@ -280,6 +280,10 @@ public class Cloner
 		fastCloners.put(c, fastCloner);
 	}
 
+    public void unregisterFastCloner(final Class<?> c) {
+        fastCloners.remove(c);
+    }
+
 	/**
 	 * creates a new instance of c. Override to provide your own implementation
 	 *

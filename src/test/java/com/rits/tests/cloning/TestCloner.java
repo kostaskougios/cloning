@@ -1,6 +1,7 @@
 package com.rits.tests.cloning;
 
 import com.rits.cloning.Cloner;
+import com.rits.cloning.FastClonerHashMap;
 import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.TestCloner.SynthOuter.Inner;
 import com.rits.tests.cloning.domain.A;
@@ -762,4 +763,10 @@ public class TestCloner extends TestCase
 		// I expect this to be true, but is is false.
 		assertEquals(0, clone.getTime());
 	}
+
+    public void testUnregisterFastCloner() {
+        Cloner cloner = new Cloner();
+        cloner.unregisterFastCloner(HashMap.class);
+        cloner.registerFastCloner(HashMap.class, new FastClonerHashMap());
+    }
 }
