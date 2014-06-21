@@ -36,7 +36,14 @@ public class Cloner
 		return dumpCloned;
 	}
 
-	public void setDumpCloned(IDumpCloned dumpCloned)
+    /**
+     * provide a cloned classes dumper (so i.e. they can be logged or stored in a file
+     * instead of the default behaviour which is to println(cloned) )
+     *
+     * @param dumpCloned an implementation of the interface which can dump the
+     *                   cloned classes.
+     */
+    public void setDumpCloned(IDumpCloned dumpCloned)
 	{
 		this.dumpCloned = dumpCloned;
 	}
@@ -631,9 +638,11 @@ public class Cloner
 	}
 
 	/**
-	 * will println() all cloned classes. Useful for debugging only.
-	 *
-	 * @param dumpClonedClasses true to enable printing all cloned classes
+     * will println() all cloned classes. Useful for debugging only. Use
+     * setDumpCloned() if you want to control where to print the cloned
+     * classes.
+     *
+     * @param dumpClonedClasses true to enable printing all cloned classes
 	 */
 	public void setDumpClonedClasses(final boolean dumpClonedClasses)
 	{
