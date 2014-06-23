@@ -460,8 +460,8 @@ public class Cloner
 		if (ignoredInstances.containsKey(o)) return o;
 		if (o instanceof Enum) return o;
 		final Class<T> clz = (Class<T>) o.getClass();
-		// skip cloning ignored classes
-		if (nullInstead.contains(clz)) return null;
+        // skip cloning ignored classes
+        if (nullInstead.contains(clz)) return null;
 		if (ignored.contains(clz)) return o;
 		for (final Class<?> iClz : ignoredInstanceOf)
 		{
