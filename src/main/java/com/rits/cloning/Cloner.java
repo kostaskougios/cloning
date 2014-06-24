@@ -108,12 +108,22 @@ public class Cloner
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
 	}
 
+    private IDeepCloner deepCloner = new IDeepCloner() {
+        public <T> T deepClone(T o, Map<Object, Object> clones) {
+            try {
+                return cloneInternal(o, clones);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    };
+
 	protected Object fastClone(final Object o, final Map<Object, Object> clones) throws IllegalAccessException
 	{
 		final Class<? extends Object> c = o.getClass();
 		final IFastCloner fastCloner = fastCloners.get(c);
-		if (fastCloner != null) return fastCloner.clone(o, this, clones);
-		return null;
+        if (fastCloner != null) return fastCloner.clone(o, deepCloner, clones);
+        return null;
 	}
 
 	public void registerConstant(final Object o)
@@ -448,13 +458,8 @@ public class Cloner
 		return false;
 	}
 
-	/**
-	 * PLEASE DONT CALL THIS METHOD
-	 * The only reason for been public is because custom IFastCloner's must invoke it
-	 */
 	@SuppressWarnings("unchecked")
-	public <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException
-	{
+    private <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
 		if (o == null) return null;
 		if (o == this) return null;
 		if (ignoredInstances.containsKey(o)) return o;

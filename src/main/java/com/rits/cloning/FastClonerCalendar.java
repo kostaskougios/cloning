@@ -10,8 +10,7 @@ import java.util.Map;
  */
 public class FastClonerCalendar implements IFastCloner
 {
-	public Object clone(final Object t, final Cloner cloner, final Map<Object, Object> clones)
-	{
+    public Object clone(final Object t, final IDeepCloner cloner, final Map<Object, Object> clones) {
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTimeInMillis(((GregorianCalendar) t).getTimeInMillis());
 		return gc;
