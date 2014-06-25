@@ -113,6 +113,7 @@ public class Cloner
             try {
                 return cloneInternal(o, clones);
             } catch (IllegalAccessException e) {
+                // just rethrow unchecked
                 throw new IllegalStateException(e);
             }
         }
