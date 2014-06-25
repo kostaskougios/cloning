@@ -57,7 +57,8 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                </configuration>
+					<compilerArgument>-Xlint:unchecked</compilerArgument>
+				</configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>

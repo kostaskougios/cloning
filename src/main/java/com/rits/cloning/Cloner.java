@@ -462,8 +462,8 @@ public class Cloner
 	@SuppressWarnings("unchecked")
     private <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
 		if (o == null) return null;
-		if (o == this) return null;
-		if (ignoredInstances.containsKey(o)) return o;
+        if (o == this) return null; // don't clone the cloner!
+        if (ignoredInstances.containsKey(o)) return o;
 		if (o instanceof Enum) return o;
 		final Class<T> clz = (Class<T>) o.getClass();
         // skip cloning ignored classes
@@ -498,58 +498,59 @@ public class Cloner
 		}
 		if (clz.isArray())
 		{
-			final int length = Array.getLength(o);
-			final T newInstance = (T) Array.newInstance(clz.getComponentType(), length);
-			if (clones != null)
-			{
-				clones.put(o, newInstance);
-			}
-			for (int i = 0; i < length; i++)
-			{
-				final Object v = Array.get(o, i);
-				final Object clone = clones != null ? cloneInternal(v, clones) : v;
-				Array.set(newInstance, i, clone);
-			}
-			return newInstance;
-		}
+            return cloneArray(o, clones);
+        }
 
-		final T newInstance = newInstance(clz);
-		if (clones != null)
-		{
-			clones.put(o, newInstance);
-		}
-		final List<Field> fields = allFields(clz);
-		for (final Field field : fields)
-		{
-			final int modifiers = field.getModifiers();
-			if (!Modifier.isStatic(modifiers))
-			{
-				if (nullTransient && Modifier.isTransient(modifiers))
-				{
-					// request by Jonathan : transient fields can be null-ed
-					final Class<?> type = field.getType();
-					if (!type.isPrimitive())
-					{
-						field.set(newInstance, null);
-					}
-				} else
-				{
-					final Object fieldObject = field.get(o);
-					final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
-					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
-					field.set(newInstance, fieldObjectClone);
-					if (dumpCloned != null && fieldObjectClone != fieldObject)
-					{
-						dumpCloned.cloning(field, o.getClass());
-					}
-				}
-			}
-		}
-		return newInstance;
-	}
+        return cloneObject(o, clones, clz);
+    }
 
-	private boolean isAnonymousParent(final Field field)
-	{
+    // clones o, no questions asked!
+    private <T> T cloneObject(T o, Map<Object, Object> clones, Class<T> clz) throws IllegalAccessException {
+        final T newInstance = newInstance(clz);
+        if (clones != null) {
+            clones.put(o, newInstance);
+        }
+        final List<Field> fields = allFields(clz);
+        for (final Field field : fields) {
+            final int modifiers = field.getModifiers();
+            if (!Modifier.isStatic(modifiers)) {
+                if (nullTransient && Modifier.isTransient(modifiers)) {
+                    // request by Jonathan : transient fields can be null-ed
+                    final Class<?> type = field.getType();
+                    if (!type.isPrimitive()) {
+                        field.set(newInstance, null);
+                    }
+                } else {
+                    final Object fieldObject = field.get(o);
+                    final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
+                    final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
+                    field.set(newInstance, fieldObjectClone);
+                    if (dumpCloned != null && fieldObjectClone != fieldObject) {
+                        dumpCloned.cloning(field, o.getClass());
+                    }
+                }
+            }
+        }
+        return newInstance;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T cloneArray(T o, Map<Object, Object> clones) throws IllegalAccessException {
+        final Class<T> clz = (Class<T>) o.getClass();
+        final int length = Array.getLength(o);
+        final T newInstance = (T) Array.newInstance(clz.getComponentType(), length);
+        if (clones != null) {
+            clones.put(o, newInstance);
+        }
+        for (int i = 0; i < length; i++) {
+            final Object v = Array.get(o, i);
+            final Object clone = clones != null ? cloneInternal(v, clones) : v;
+            Array.set(newInstance, i, clone);
+        }
+        return newInstance;
+    }
+
+    private boolean isAnonymousParent(final Field field) {
 		return "this$0".equals(field.getName());
 	}
 
