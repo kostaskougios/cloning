@@ -8,8 +8,7 @@ import static org.junit.Assert.assertSame;
 
 /**
  * @author kostantinos.kougios
- *         <p/>
- *         23 Sep 2012
+ * 23 Sep 2012
  */
 public class CloneInnerAnonTest
 {

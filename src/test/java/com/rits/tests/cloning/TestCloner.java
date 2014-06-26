@@ -19,7 +19,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author kostantinos.kougios
- *         <p/>
+ *
  *         18 Sep 2008
  */
 public class TestCloner extends TestCase

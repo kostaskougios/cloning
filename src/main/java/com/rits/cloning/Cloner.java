@@ -14,11 +14,10 @@ import java.util.regex.Pattern;
 
 /**
  * Cloner: deep clone objects.
- * <p/>
+ *
  * This class is thread safe. One instance can be used by multiple threads on the same time.
  *
  * @author kostantinos.kougios
- *         <p/>
  *         18 Sep 2008
  */
 public class Cloner
@@ -190,7 +189,7 @@ public class Cloner
 	/**
 	 * registers all static fields of these classes. Those static fields won't be cloned when an instance
 	 * of the class is cloned.
-	 * <p/>
+	 *
 	 * This is useful i.e. when a static field object is added into maps or sets. At that point, there is no
 	 * way for the cloner to know that it was static except if it is registered.
 	 *
