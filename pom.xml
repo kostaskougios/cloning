@@ -9,7 +9,7 @@
 	<groupId>com.rits</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
-	<version>2.0.0</version>
+	<version>1.9.1-SNAPSHOT</version>
 	<name>cloning</name>
 	<url>https://code.google.com/p/cloning/</url>
 	<description><![CDATA[
