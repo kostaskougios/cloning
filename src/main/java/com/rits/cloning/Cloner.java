@@ -71,7 +71,7 @@ public class Cloner
 
 	/**
 	 * this makes the cloner to set a transient field to null upon cloning.
-	 * <p/>
+	 *
 	 * NOTE: primitive types can't be nulled. Their value will be set to default, i.e. 0 for int
 	 *
 	 * @param nullTransient true for transient fields to be nulled
