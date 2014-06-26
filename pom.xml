@@ -6,7 +6,7 @@
 		<artifactId>oss-parent</artifactId>
 		<version>5</version>
 	</parent>
-	<groupId>com.rits</groupId>
+	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
 	<version>1.9.1-SNAPSHOT</version>
@@ -21,15 +21,6 @@
                 implementations, if you don't want the cached object
                 to be modified or whenever you want to create a deep
                 copy of an object.
-
-                Sample usage:
-
-                You can create a single instance of cloner and use it throughout your application. i.e.
-                Cloner cloner=new Cloner();
-                ...
-                cloner.deepClone(o);
-
-                Please check http://robust-it.co.uk/clone/ for more examples (spring integration, immutable objects etc)
         ]]></description>
 	<licenses>
 		<license>
