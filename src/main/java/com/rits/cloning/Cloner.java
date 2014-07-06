@@ -393,7 +393,7 @@ public class Cloner {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
+	protected <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
 		if (o == null) return null;
 		if (o == this) return null; // don't clone the cloner!
 		if (ignoredInstances.containsKey(o)) return o;
