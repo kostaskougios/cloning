@@ -594,4 +594,21 @@ public class Cloner {
 	public boolean isCloneAnonymousParent() {
 		return cloneAnonymousParent;
 	}
+
+	/**
+	 * @return a standard cloner instance, will do for most use cases
+	 */
+	public static Cloner standard() {
+		return new Cloner();
+	}
+
+	/**
+	 * @return if Cloner lib is in a shared jar folder for a container (i.e. tomcat/shared), then
+	 * 		this method is preferable in order to instantiate cloner. Please
+	 * 		see https://code.google.com/p/cloning/issues/detail?id=23
+	 */
+	public static Cloner shared() {
+		return new Cloner(new ObjenesisInstantiationStrategy());
+	}
+
 }
