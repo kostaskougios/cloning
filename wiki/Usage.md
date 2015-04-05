@@ -138,4 +138,4 @@ final Cloner cloner = new Cloner()
 
 # More ... #
 
-Can be found by looking at the test cases : https://code.google.com/p/cloning/source/browse/#git%2Fsrc%2Ftest%2Fjava%2Fcom%2Frits%2Ftests%2Fcloning
+Can be found by looking at the test cases : https://github.com/kostaskougios/cloning/tree/master/src/test/java/com/rits/tests/cloning
