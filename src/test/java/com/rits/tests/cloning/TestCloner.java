@@ -32,7 +32,7 @@ public class TestCloner extends TestCase
 
 	@Target(TYPE)
 	@Retention(RUNTIME)
-	static private @interface MyImmutable
+	private @interface MyImmutable
 	{
 
 	}
@@ -40,6 +40,13 @@ public class TestCloner extends TestCase
 	@MyImmutable
 	static private class MyAX
 	{
+	}
+
+	public void testCalendarTimezone() {
+		TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
+		Calendar c = Calendar.getInstance(timeZone);
+		Calendar cloned = cloner.deepClone(c);
+		assertEquals(timeZone, cloned.getTimeZone());
 	}
 
 	public void testCloneEnumInMapIssue20()
