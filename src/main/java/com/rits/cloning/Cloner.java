@@ -441,13 +441,8 @@ public class Cloner {
 		for (final Field field : fields) {
 			final int modifiers = field.getModifiers();
 			if (!Modifier.isStatic(modifiers)) {
-				if (nullTransient && Modifier.isTransient(modifiers)) {
+				if ( ! (nullTransient && Modifier.isTransient(modifiers)) ) {
 					// request by Jonathan : transient fields can be null-ed
-					final Class<?> type = field.getType();
-					if (!type.isPrimitive()) {
-						field.set(newInstance, null);
-					}
-				} else {
 					final Object fieldObject = field.get(o);
 					final boolean shouldClone = (cloneSynthetics || !field.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(field));
 					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
