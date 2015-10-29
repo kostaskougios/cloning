@@ -449,7 +449,7 @@ public class Cloner {
 					}
 				} else {
 					final Object fieldObject = field.get(o);
-					final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
+					final boolean shouldClone = (cloneSynthetics || !field.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(field));
 					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpCloned != null && fieldObjectClone != fieldObject) {
