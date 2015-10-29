@@ -464,10 +464,14 @@ public class Cloner {
 		if (clones != null) {
 			clones.put(o, newInstance);
 		}
-		for (int i = 0; i < length; i++) {
-			final Object v = Array.get(o, i);
-			final Object clone = clones != null ? cloneInternal(v, clones) : v;
-			Array.set(newInstance, i, clone);
+		if(clz.getComponentType().isPrimitive() || isImmutable(clz.getComponentType())) {
+			System.arraycopy(o, 0, newInstance, 0, length);
+		} else {
+			for (int i = 0; i < length; i++) {
+				final Object v = Array.get(o, i);
+				final Object clone = clones != null ? cloneInternal(v, clones) : v;
+				Array.set(newInstance, i, clone);
+			}
 		}
 		return newInstance;
 	}
