@@ -12,10 +12,9 @@ public class ObjenesisInstantiationStrategy implements IInstantiationStrategy
 {
 	private final Objenesis	objenesis	= new ObjenesisStd();
 
-	@SuppressWarnings("unchecked")
 	public <T> T newInstance(Class<T> c)
 	{
-		return (T) objenesis.newInstance(c);
+		return objenesis.newInstance(c);
 	}
 
 	private static ObjenesisInstantiationStrategy	instance	= new ObjenesisInstantiationStrategy();
