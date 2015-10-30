@@ -441,15 +441,10 @@ public class Cloner {
 		for (final Field field : fields) {
 			final int modifiers = field.getModifiers();
 			if (!Modifier.isStatic(modifiers)) {
-				if (nullTransient && Modifier.isTransient(modifiers)) {
+				if ( ! (nullTransient && Modifier.isTransient(modifiers)) ) {
 					// request by Jonathan : transient fields can be null-ed
-					final Class<?> type = field.getType();
-					if (!type.isPrimitive()) {
-						field.set(newInstance, null);
-					}
-				} else {
 					final Object fieldObject = field.get(o);
-					final boolean shouldClone = (cloneSynthetics || (!cloneSynthetics && !field.isSynthetic())) && (cloneAnonymousParent || ((!cloneAnonymousParent && !isAnonymousParent(field))));
+					final boolean shouldClone = (cloneSynthetics || !field.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(field));
 					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpCloned != null && fieldObjectClone != fieldObject) {
@@ -469,10 +464,14 @@ public class Cloner {
 		if (clones != null) {
 			clones.put(o, newInstance);
 		}
-		for (int i = 0; i < length; i++) {
-			final Object v = Array.get(o, i);
-			final Object clone = clones != null ? cloneInternal(v, clones) : v;
-			Array.set(newInstance, i, clone);
+		if(clz.getComponentType().isPrimitive() || isImmutable(clz.getComponentType())) {
+			System.arraycopy(o, 0, newInstance, 0, length);
+		} else {
+			for (int i = 0; i < length; i++) {
+				final Object v = Array.get(o, i);
+				final Object clone = clones != null ? cloneInternal(v, clones) : v;
+				Array.set(newInstance, i, clone);
+			}
 		}
 		return newInstance;
 	}
