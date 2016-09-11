@@ -94,6 +94,7 @@ public class Cloner {
 		fastCloners.put(HashSet.class, new FastClonerHashSet());
 		fastCloners.put(HashMap.class, new FastClonerHashMap());
 		fastCloners.put(TreeMap.class, new FastClonerTreeMap());
+		fastCloners.put(LinkedHashMap.class, new FastClonerLinkedHashMap());
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
 	}
 

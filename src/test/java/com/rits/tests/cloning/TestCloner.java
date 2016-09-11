@@ -776,4 +776,32 @@ public class TestCloner extends TestCase
         cloner.unregisterFastCloner(HashMap.class);
         cloner.registerFastCloner(HashMap.class, new FastClonerHashMap());
     }
+
+	public void testEmptyLinkedHashMap() {
+		LinkedHashMap<Integer, Integer> m = new LinkedHashMap<Integer, Integer>();
+		LinkedHashMap<Integer, Integer> cloned = cloner.deepClone(m);
+		assertEquals(m, cloned);
+	}
+
+	public void testLinkedHashMap() {
+		LinkedHashMap<Integer, Integer> m = new LinkedHashMap<Integer, Integer>();
+		for (int i = 1; i < 10000; i++) {
+			m.put(i, i * 2);
+		}
+		LinkedHashMap<Integer, Integer> cloned = cloner.deepClone(m);
+		assertEquals(m, cloned);
+	}
+
+	public void testLinkedHashMapIterationOrder() {
+		LinkedHashMap<Integer, Integer> m = new LinkedHashMap<Integer, Integer>();
+		for (int i = 1000; i >= 1; i--) {
+			m.put(i, i * 2);
+		}
+		LinkedHashMap<Integer, Integer> cloned = cloner.deepClone(m);
+		Iterator<Integer> it = cloned.keySet().iterator();
+		for (int i = 1000; i >= 1; i--) {
+			assertEquals((Integer) i, it.next());
+		}
+	}
+
 }
