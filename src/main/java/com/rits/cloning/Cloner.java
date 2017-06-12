@@ -122,13 +122,17 @@ public class Cloner {
 
 	public void registerConstant(final Class<?> c, final String privateFieldName) {
 		try {
-			final Field field = c.getDeclaredField(privateFieldName);
-			field.setAccessible(true);
-			final Object v = field.get(null);
-			ignoredInstances.put(v, true);
+			List<Field> fields = allFields(c);
+			for (Field field : fields) {
+				if (field.getName().equals(privateFieldName)) {
+					field.setAccessible(true);
+					final Object v = field.get(null);
+					ignoredInstances.put(v, true);
+					return;
+				}
+			}
+			throw new RuntimeException("No such field : " + privateFieldName);
 		} catch (final SecurityException e) {
-			throw new RuntimeException(e);
-		} catch (final NoSuchFieldException e) {
 			throw new RuntimeException(e);
 		} catch (final IllegalArgumentException e) {
 			throw new RuntimeException(e);
