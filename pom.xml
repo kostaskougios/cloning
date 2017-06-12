@@ -9,7 +9,7 @@
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
-	<version>1.9.3</version>
+	<version>1.9.4</version>
 	<name>cloning</name>
 	<url>https://code.google.com/p/cloning/</url>
 	<description><![CDATA[
