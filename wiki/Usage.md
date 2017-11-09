@@ -7,7 +7,7 @@ Cloning can be potentially dangerous. Cloning files, streams can make the JVM cr
 You may get a warning in jdk 9 due to the reflection that the cloning library uses to clone objects:
 
     WARNING: An illegal reflective access operation has occurred
-    WARNING: Illegal reflective access by com.rits.cloning.Cloner (file:/C:/Users/Username/.gradle/caches/modules-2/files-2.1/uk.com.robust-it/cloning/1.9.6/22ff4e3fc66dd84a57f39a9b4c6325e41a389225/cloning-1.9.6.jar) to field java.util.TreeSet.m
+    WARNING: Illegal reflective access by com.rits.cloning.Cloner 
     WARNING: Please consider reporting this to the maintainers of com.rits.cloning.Cloner
     WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
     WARNING: All illegal access operations will be denied in a future release
