@@ -8,6 +8,4 @@ public interface ICloningStrategy {
 	}
 
 	Strategy strategyFor(Object toBeCloned);
-
-//	public static ICloningStrategy
 }
