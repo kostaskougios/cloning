@@ -4,8 +4,7 @@ import com.rits.cloning.Cloner;
 import com.rits.cloning.ICloningStrategy;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 public class TestCloningStrategies {
 
@@ -31,5 +30,17 @@ public class TestCloningStrategies {
 		});
 		Object o = new Object();
 		assertSame(o, cloner.deepClone(o));
+	}
+
+	@Test
+	public void ignoreStrategy() {
+		Cloner cloner = Cloner.standard();
+		cloner.registerCloningStrategy(new ICloningStrategy() {
+			public Strategy strategyFor(Object toBeCloned) {
+				return Strategy.IGNORE;
+			}
+		});
+		Object o = new Object();
+		assertNotSame(o, cloner.deepClone(o));
 	}
 }
