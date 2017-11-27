@@ -2,6 +2,16 @@
 
 Cloning can be potentially dangerous. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects returned by ORM libraries) means a big graph of objects might be cloned which can lead to performance issues and potential crashes. Always enable cloner's debug mode during development, which will print all cloned classes to the console : cloner.setDumpClonedClasses(true)
 
+# Jdk 9
+
+You may get a warning in jdk 9 due to the reflection that the cloning library uses to clone objects:
+
+    WARNING: An illegal reflective access operation has occurred
+    WARNING: Illegal reflective access by com.rits.cloning.Cloner 
+    WARNING: Please consider reporting this to the maintainers of com.rits.cloning.Cloner
+    WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+    WARNING: All illegal access operations will be denied in a future release
+
 # Example #
 You can create a single instance of cloner and use it throughout your application to deep clone objects. Once instantiated and configured, then the cloner is thread safe and can be reused, provided it's configuration is not altered.
 
