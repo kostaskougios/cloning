@@ -28,6 +28,7 @@ public class Cloner {
 	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<Class<?>, IFastCloner>();
 	private final Map<Object, Boolean> ignoredInstances = new IdentityHashMap<Object, Boolean>();
 	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<Class<?>, List<Field>>();
+	private final List<ICloningStrategy> cloningStrategies = new LinkedList<ICloningStrategy>();
 
 	public IDumpCloned getDumpCloned() {
 		return dumpCloned;
@@ -169,6 +170,11 @@ public class Cloner {
 	protected void registerKnownConstants() {
 		// registering known constants of the jdk. 
 		registerStaticFields(TreeSet.class, HashSet.class, HashMap.class, TreeMap.class);
+	}
+
+	public void registerCloningStrategy(ICloningStrategy strategy) {
+		if (strategy == null) throw new NullPointerException("strategy can't be null");
+		cloningStrategies.add(strategy);
 	}
 
 	/**
@@ -401,6 +407,11 @@ public class Cloner {
 	protected <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
 		if (o == null) return null;
 		if (o == this) return null; // don't clone the cloner!
+		for (ICloningStrategy strategy : cloningStrategies) {
+			ICloningStrategy.Strategy s = strategy.strategyFor(o);
+			if (s == ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE) return null;
+			if (s == ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE) return o;
+		}
 		if (ignoredInstances.containsKey(o)) return o;
 		if (o instanceof Enum) return o;
 		final Class<T> clz = (Class<T>) o.getClass();
@@ -446,7 +457,7 @@ public class Cloner {
 		for (final Field field : fields) {
 			final int modifiers = field.getModifiers();
 			if (!Modifier.isStatic(modifiers)) {
-				if ( ! (nullTransient && Modifier.isTransient(modifiers)) ) {
+				if (!(nullTransient && Modifier.isTransient(modifiers))) {
 					// request by Jonathan : transient fields can be null-ed
 					final Object fieldObject = field.get(o);
 					final boolean shouldClone = (cloneSynthetics || !field.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(field));
@@ -469,7 +480,7 @@ public class Cloner {
 		if (clones != null) {
 			clones.put(o, newInstance);
 		}
-		if(clz.getComponentType().isPrimitive() || isImmutable(clz.getComponentType())) {
+		if (clz.getComponentType().isPrimitive() || isImmutable(clz.getComponentType())) {
 			System.arraycopy(o, 0, newInstance, 0, length);
 		} else {
 			for (int i = 0; i < length; i++) {
