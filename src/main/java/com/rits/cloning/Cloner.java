@@ -407,11 +407,6 @@ public class Cloner {
 	protected <T> T cloneInternal(final T o, final Map<Object, Object> clones) throws IllegalAccessException {
 		if (o == null) return null;
 		if (o == this) return null; // don't clone the cloner!
-		for (ICloningStrategy strategy : cloningStrategies) {
-			ICloningStrategy.Strategy s = strategy.strategyFor(o);
-			if (s == ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE) return null;
-			if (s == ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE) return o;
-		}
 		if (ignoredInstances.containsKey(o)) return o;
 		if (o instanceof Enum) return o;
 		final Class<T> clz = (Class<T>) o.getClass();
@@ -461,7 +456,7 @@ public class Cloner {
 					// request by Jonathan : transient fields can be null-ed
 					final Object fieldObject = field.get(o);
 					final boolean shouldClone = (cloneSynthetics || !field.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(field));
-					final Object fieldObjectClone = clones != null ? (shouldClone ? cloneInternal(fieldObject, clones) : fieldObject) : fieldObject;
+					final Object fieldObjectClone = clones != null ? (shouldClone ? applyCloningStrategy(clones, o, fieldObject, field) : fieldObject) : fieldObject;
 					field.set(newInstance, fieldObjectClone);
 					if (dumpCloned != null && fieldObjectClone != fieldObject) {
 						dumpCloned.cloning(field, o.getClass());
@@ -470,6 +465,15 @@ public class Cloner {
 			}
 		}
 		return newInstance;
+	}
+
+	private Object applyCloningStrategy(Map<Object, Object> clones, Object o, Object fieldObject, Field field) throws IllegalAccessException {
+		for (ICloningStrategy strategy : cloningStrategies) {
+			ICloningStrategy.Strategy s = strategy.strategyFor(o, field);
+			if (s == ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE) return null;
+			if (s == ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE) return o;
+		}
+		return cloneInternal(fieldObject, clones);
 	}
 
 	@SuppressWarnings("unchecked")
