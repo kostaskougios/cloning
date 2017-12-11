@@ -471,7 +471,7 @@ public class Cloner {
 		for (ICloningStrategy strategy : cloningStrategies) {
 			ICloningStrategy.Strategy s = strategy.strategyFor(o, field);
 			if (s == ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE) return null;
-			if (s == ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE) return o;
+			if (s == ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE) return fieldObject;
 		}
 		return cloneInternal(fieldObject, clones);
 	}

@@ -10,8 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class TestCloningStrategies {
 
@@ -20,13 +19,15 @@ public class TestCloningStrategies {
 	@interface Ann {
 	}
 
+	class Data {
+	}
 	class AnnotatedExample {
 		@Ann
-		public Object o = new Object();
+		public Data o = new Data();
 	}
 
 	class NotAnnotatedExample {
-		public Object o = new Object();
+		public Data o = new Data();
 	}
 
 	@Test
@@ -41,5 +42,21 @@ public class TestCloningStrategies {
 		Cloner cloner = Cloner.standard();
 		cloner.registerCloningStrategy(CloningStrategyFactory.annotatedField(Ann.class, ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE));
 		assertNotNull(cloner.deepClone(new NotAnnotatedExample()).o);
+	}
+
+	@Test
+	public void annotatedClassSameInstancePositive() {
+		Cloner cloner = Cloner.standard();
+		cloner.registerCloningStrategy(CloningStrategyFactory.annotatedField(Ann.class, ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE));
+		AnnotatedExample ae = new AnnotatedExample();
+		assertSame(ae.o, cloner.deepClone(ae).o);
+	}
+
+	@Test
+	public void annotatedClassSameInstanceNegative() {
+		Cloner cloner = Cloner.standard();
+		cloner.registerCloningStrategy(CloningStrategyFactory.annotatedField(Ann.class, ICloningStrategy.Strategy.SAME_INSTANCE_INSTEAD_OF_CLONE));
+		NotAnnotatedExample ae = new NotAnnotatedExample();
+		assertNotSame(ae.o, cloner.deepClone(ae).o);
 	}
 }
