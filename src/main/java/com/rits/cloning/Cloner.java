@@ -97,6 +97,15 @@ public class Cloner {
 		fastCloners.put(TreeMap.class, new FastClonerTreeMap());
 		fastCloners.put(LinkedHashMap.class, new FastClonerLinkedHashMap());
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
+
+		// register private classes
+		try {
+			ClassLoader classLoader = getClass().getClassLoader();
+			Class<?> subListClz = classLoader.loadClass("java.util.ArrayList$SubList");
+			fastCloners.put(subListClz, new FastClonerArrayListSubList());
+		} catch (ClassNotFoundException e) {
+			// ignore, maybe a jdk without SubList
+		}
 	}
 
 	private IDeepCloner deepCloner = new IDeepCloner() {

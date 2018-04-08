@@ -804,4 +804,19 @@ public class TestCloner extends TestCase
 		}
 	}
 
+	public void testCloneArrayListSubList() {
+		List<String> a = new ArrayList<String>();
+		a.add("1");
+		a.add("2");
+		a.add("3");
+
+		List<String> b = a.subList(0, 1);
+
+		b.add("3");
+		b.remove(0);
+
+		b.size(); // fine
+
+		assertEquals(1, cloner.deepClone(b).size()); // throws ConcurrentModificationException
+	}
 }
