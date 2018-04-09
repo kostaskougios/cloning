@@ -819,4 +819,21 @@ public class TestCloner extends TestCase
 
 		assertEquals(1, cloner.deepClone(b).size()); // throws ConcurrentModificationException
 	}
+
+	public void testCloneLinkedListSubList() {
+		List<String> a = new LinkedList<String>();
+		a.add("1");
+		a.add("2");
+		a.add("3");
+
+		List<String> b = a.subList(0, 1);
+
+		b.add("3");
+		b.remove(0);
+
+		b.size(); // fine
+
+		List<String> clone = cloner.deepClone(b);
+		assertEquals(1, clone.size());
+	}
 }

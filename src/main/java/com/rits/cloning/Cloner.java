@@ -99,10 +99,17 @@ public class Cloner {
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
 
 		// register private classes
+		FastClonerArrayListSubList subListCloner = new FastClonerArrayListSubList();
+		registerInaccessibleClassToBeFastCloned("java.util.ArrayList$SubList", subListCloner);
+		registerInaccessibleClassToBeFastCloned("java.util.SubList", subListCloner);
+		registerInaccessibleClassToBeFastCloned("java.util.RandomAccessSubList", subListCloner);
+	}
+
+	protected void registerInaccessibleClassToBeFastCloned(String className, IFastCloner fastCloner) {
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
-			Class<?> subListClz = classLoader.loadClass("java.util.ArrayList$SubList");
-			fastCloners.put(subListClz, new FastClonerArrayListSubList());
+			Class<?> subListClz = classLoader.loadClass(className);
+			fastCloners.put(subListClz, fastCloner);
 		} catch (ClassNotFoundException e) {
 			// ignore, maybe a jdk without SubList
 		}
