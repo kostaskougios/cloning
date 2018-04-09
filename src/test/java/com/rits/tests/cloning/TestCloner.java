@@ -836,4 +836,16 @@ public class TestCloner extends TestCase
 		List<String> clone = cloner.deepClone(b);
 		assertEquals(1, clone.size());
 	}
+
+	public void testHashMapIterator() {
+		HashMap<Integer, String> m = new HashMap<Integer, String>();
+		m.put(1, "one");
+		m.put(2, "two");
+
+		Iterator<Map.Entry<Integer, String>> it = m.entrySet().iterator();
+		m.put(3, "three");
+
+		Iterator<Map.Entry<Integer, String>> cIt = cloner.deepClone(it);
+		cIt.next(); // throws ConcurrentModificationException
+	}
 }

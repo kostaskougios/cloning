@@ -126,7 +126,7 @@ public class Cloner {
 		}
 	};
 
-	protected Object fastClone(final Object o, final Map<Object, Object> clones) throws IllegalAccessException {
+	protected Object fastClone(final Object o, final Map<Object, Object> clones) {
 		final Class<? extends Object> c = o.getClass();
 		final IFastCloner fastCloner = fastCloners.get(c);
 		if (fastCloner != null) return fastCloner.clone(o, deepCloner, clones);
@@ -300,12 +300,8 @@ public class Cloner {
 
 	@SuppressWarnings("unchecked")
 	public <T> T fastCloneOrNewInstance(final Class<T> c) {
-		try {
-			final T fastClone = (T) fastClone(c, null);
-			if (fastClone != null) return fastClone;
-		} catch (final IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
+		final T fastClone = (T) fastClone(c, null);
+		if (fastClone != null) return fastClone;
 		return newInstance(c);
 
 	}
