@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
 
 /**
@@ -97,6 +98,7 @@ public class Cloner {
 		fastCloners.put(TreeMap.class, new FastClonerTreeMap());
 		fastCloners.put(LinkedHashMap.class, new FastClonerLinkedHashMap());
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
+		fastCloners.put(ConcurrentLinkedQueue.class, new FastClonerConcurrentLinkedQueue());
 
 		// register private classes
 		FastClonerArrayListSubList subListCloner = new FastClonerArrayListSubList();
