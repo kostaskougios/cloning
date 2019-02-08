@@ -9,7 +9,7 @@
 	<groupId>uk.com.robust-it</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
-	<version>1.9.11</version>
+	<version>1.9.12</version>
 	<name>cloning</name>
 	<url>https://code.google.com/p/cloning/</url>
 	<description><![CDATA[
@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>org.objenesis</groupId>
 			<artifactId>objenesis</artifactId>
-			<version>2.6</version>
+			<version>3.0.1</version>
 		</dependency>
 	</dependencies>
 	<profiles>
@@ -162,4 +162,4 @@
 			</build>
 		</profile>
 	</profiles>
-</project> 
+</project>
