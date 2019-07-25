@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
 /**
@@ -23,14 +22,15 @@ import java.util.regex.Pattern;
  *         18 Sep 2008
  */
 public class Cloner {
-	private IInstantiationStrategy instantiationStrategy;
-	private final Set<Class<?>> ignored = new HashSet<>();
-	private final Set<Class<?>> ignoredInstanceOf = new HashSet<>();
-	private final Set<Class<?>> nullInstead = new HashSet<>();
-	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<>();
-	private final Map<Object, Boolean> ignoredInstances = new IdentityHashMap<>();
-	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<>();
-	private final List<ICloningStrategy> cloningStrategies = new ArrayList<>();
+	private final IInstantiationStrategy instantiationStrategy;
+	private final Set<Class<?>> ignored = new HashSet<Class<?>>();
+	private final Set<Class<?>> ignoredInstanceOf = new HashSet<Class<?>>();
+	private final Set<Class<?>> nullInstead = new HashSet<Class<?>>();
+	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<Class<?>, IFastCloner>();
+	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<Class<?>, List<Field>>();
+	private List<ICloningStrategy> cloningStrategies;
+
+	private Map<Object, Object> ignoredInstances;
 
 	public IDumpCloned getDumpCloned() {
 		return dumpCloned;
@@ -53,6 +53,7 @@ public class Cloner {
 	private boolean cloneSynthetics = true;
 
 	public Cloner() {
+		this.instantiationStrategy = ObjenesisInstantiationStrategy.getInstance();
 		init();
 	}
 
@@ -133,7 +134,10 @@ public class Cloner {
 	}
 
 	public void registerConstant(Object o) {
-		ignoredInstances.put(o, true);
+		if (ignoredInstances == null) {
+			ignoredInstances = new IdentityHashMap<Object, Object>();
+		}
+		ignoredInstances.put(o, o);
 	}
 
 	public void registerConstant(Class<?> c, String privateFieldName) {
@@ -148,7 +152,11 @@ public class Cloner {
 				}
 			}
 			throw new RuntimeException("No such field : " + privateFieldName);
-		} catch (final SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (final SecurityException e) {
+			throw new RuntimeException(e);
+		} catch (final IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (final IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -179,12 +187,13 @@ public class Cloner {
 	}
 
 	protected void registerKnownConstants() {
-		// registering known constants of the jdk. 
-		registerStaticFields(TreeSet.class, HashSet.class, HashMap.class, TreeMap.class);
 	}
 
 	public void registerCloningStrategy(ICloningStrategy strategy) {
 		if (strategy == null) throw new NullPointerException("strategy can't be null");
+		if (cloningStrategies == null) {
+			cloningStrategies = new ArrayList<ICloningStrategy>();
+		}
 		cloningStrategies.add(strategy);
 	}
 
@@ -298,7 +307,6 @@ public class Cloner {
 		final T fastClone = (T) fastClone(c, null);
 		if (fastClone != null) return fastClone;
 		return newInstance(c);
-
 	}
 
 	/**
@@ -314,7 +322,7 @@ public class Cloner {
 		if (dumpCloned != null) {
 			dumpCloned.startCloning(o.getClass());
 		}
-		final Map<Object, Object> clones = new IdentityHashMap<>(16);
+		Map<Object, Object> clones = new ClonesMap();
 		return cloneInternal(o, clones);
 	}
 
@@ -324,7 +332,7 @@ public class Cloner {
 		if (dumpCloned != null) {
 			dumpCloned.startCloning(o.getClass());
 		}
-		final Map<Object, Object> clones = new IdentityHashMap<>(16);
+		final Map<Object, Object> clones = new ClonesMap();
 		for (final Object dc : dontCloneThese) {
 			clones.put(dc, dc);
 		}
@@ -346,7 +354,7 @@ public class Cloner {
 	}
 
 	// caches immutables for quick reference
-	private final ConcurrentHashMap<Class<?>, Boolean> immutables = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Class<?>, Boolean> immutables = new ConcurrentHashMap<Class<?>, Boolean>();
 	private boolean cloneAnonymousParent = true;
 
 	/**
@@ -398,14 +406,12 @@ public class Cloner {
 		return false;
 	}
 
-	private Map<Class, IDeepCloner> cloners = Collections.synchronizedMap(new HashMap<>());
+	private Map<Class, IDeepCloner> cloners = Collections.synchronizedMap(new HashMap<Class, IDeepCloner>());
 
 	@SuppressWarnings("unchecked")
 	protected <T> T cloneInternal(T o, Map<Object, Object> clones) {
 		if (o == null) return null;
 		if (o == this) return null;
-		if (o instanceof Enum) return o;
-		if (ignoredInstances.containsKey(o)) return o;
 
 		// Prevent cycles, expensive but necessary
 		if (clones != null) {
@@ -430,7 +436,9 @@ public class Cloner {
 	}
 
 	private IDeepCloner findDeepCloner(Class<?> clz) {
-		if (IFreezable.class.isAssignableFrom(clz)) {
+		if (Enum.class.isAssignableFrom(clz)) {
+			return IGNORE_CLONER;
+		} else if (IFreezable.class.isAssignableFrom(clz)) {
 			return new IFreezableCloner(clz);
 		} else if (nullInstead.contains(clz)) {
 			return NULL_CLONER;
@@ -499,7 +507,7 @@ public class Cloner {
 
 		FastClonerCloner(IFastCloner fastCloner) {
 			this.fastCloner = fastCloner;
-			this.cloneInternal = Cloner.this::cloneInternal;
+			this.cloneInternal = deepCloner;
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
@@ -531,7 +539,6 @@ public class Cloner {
 			cloner = new CloneObjectCloner(clz);
 		}
 
-		@Override
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
 			if (o instanceof IFreezable) {
 				IFreezable f = (IFreezable) o;
@@ -542,28 +549,16 @@ public class Cloner {
 	}
 
 	private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
-	private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
-	private static final Constructor OBJECT_CONSTRUCTOR;
-
-	static {
-		try {
-			OBJECT_CONSTRUCTOR = Object.class.getConstructor((Class[]) null);
-		} catch (NoSuchMethodException e) {
-			throw new AssertionError(e);
-		}
-	}
 
 	private class CloneObjectCloner implements IDeepCloner {
 
-		private final Constructor constructor;
 		private final Field[] fields;
 		private final boolean[] shouldClone;
 		private final int numFields;
 
 		CloneObjectCloner(Class<?> clz) {
-			constructor = REFLECTION_FACTORY.newConstructorForSerialization(clz, OBJECT_CONSTRUCTOR);
-			List<Field> l = new ArrayList<>();
-			List<Boolean> shouldCloneList = new ArrayList<>();
+			List<Field> l = new ArrayList<Field>();
+			List<Boolean> shouldCloneList = new ArrayList<Boolean>();
 			Class<?> sc = clz;
 			do {
 				Field[] fs = sc.getDeclaredFields();
@@ -594,7 +589,7 @@ public class Cloner {
 				if (dumpCloned != null) {
 					dumpCloned.startCloning(o.getClass());
 				}
-				T newInstance = instantiationStrategy == null ? (T) constructor.newInstance() : instantiationStrategy.newInstance((Class<T>)o.getClass());
+				T newInstance = instantiationStrategy.newInstance((Class<T>)o.getClass());
 				if (clones != null) {
 					clones.put(o, newInstance);
 					for (int i = 0; i < numFields; i++) {
@@ -614,14 +609,14 @@ public class Cloner {
 					}
 				}
 				return newInstance;
-			} catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			} catch (IllegalAccessException e) {
 				throw new AssertionError(e);
 			}
 		}
 	}
 
 	private Object applyCloningStrategy(Map<Object, Object> clones, Object o, Object fieldObject, Field field) {
-		if (!cloningStrategies.isEmpty()) {
+		if (cloningStrategies != null) {
 			for (ICloningStrategy strategy : cloningStrategies) {
 				ICloningStrategy.Strategy s = strategy.strategyFor(o, field);
 				if (s == ICloningStrategy.Strategy.NULL_INSTEAD_OF_CLONE) return null;
@@ -666,7 +661,9 @@ public class Cloner {
 					if (destFields.contains(field)) {
 						field.set(dest, fieldObject);
 					}
-				} catch (final IllegalArgumentException | IllegalAccessException e) {
+				} catch (final IllegalArgumentException e) {
+					throw new RuntimeException(e);
+				} catch (final IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -691,7 +688,7 @@ public class Cloner {
 	protected List<Field> allFields(final Class<?> c) {
 		List<Field> l = fieldsCache.get(c);
 		if (l == null) {
-			l = new LinkedList<>();
+			l = new LinkedList<Field>();
 			final Field[] fields = c.getDeclaredFields();
 			addAll(l, fields);
 			Class<?> sc = c;
@@ -763,4 +760,14 @@ public class Cloner {
 		return new Cloner(new ObjenesisInstantiationStrategy());
 	}
 
+	private class ClonesMap extends IdentityHashMap<Object, Object> {
+		@Override
+		public Object get(Object key) {
+			if (ignoredInstances != null) {
+				Object o = ignoredInstances.get(key);
+				if (o != null) return o;
+			}
+			return super.get(key);
+		}
+	}
 }
