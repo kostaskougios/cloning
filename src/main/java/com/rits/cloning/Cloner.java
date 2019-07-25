@@ -1,5 +1,6 @@
 package com.rits.cloning;
 
+import org.objenesis.instantiator.ObjectInstantiator;
 import sun.reflect.ReflectionFactory;
 
 import java.lang.annotation.Annotation;
@@ -555,6 +556,7 @@ public class Cloner {
 		private final Field[] fields;
 		private final boolean[] shouldClone;
 		private final int numFields;
+		private final ObjectInstantiator<?> instantiator;
 
 		CloneObjectCloner(Class<?> clz) {
 			List<Field> l = new ArrayList<Field>();
@@ -582,6 +584,7 @@ public class Cloner {
 			for (int i = 0; i < shouldCloneList.size(); i++) {
 				shouldClone[i] = shouldCloneList.get(i);
 			}
+			instantiator = instantiationStrategy.getInstantiatorOf(clz);
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
@@ -589,7 +592,7 @@ public class Cloner {
 				if (dumpCloned != null) {
 					dumpCloned.startCloning(o.getClass());
 				}
-				T newInstance = instantiationStrategy.newInstance((Class<T>)o.getClass());
+				T newInstance = (T) instantiator.newInstance();
 				if (clones != null) {
 					clones.put(o, newInstance);
 					for (int i = 0; i < numFields; i++) {
