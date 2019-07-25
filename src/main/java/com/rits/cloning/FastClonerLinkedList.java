@@ -16,8 +16,7 @@ public class FastClonerLinkedList implements IFastCloner
 		final LinkedList l = new LinkedList();
 		for (final Object o : al)
 		{
-            final Object cloneInternal = cloner.deepClone(o, clones);
-            l.add(cloneInternal);
+			l.add(cloner.deepClone(o, clones));
 		}
 		return l;
 	}

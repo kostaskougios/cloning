@@ -19,7 +19,7 @@ public class FastClonerTreeSet implements IFastCloner {
 			comparator = TreeMap.class.getDeclaredField("comparator");
 			comparator.setAccessible(true);
 		} catch (NoSuchFieldException e) {
-			throw new AssertionError(e);
+			throw new CloningException(e);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class FastClonerTreeSet implements IFastCloner {
 		try {
 			result = new TreeSet((Comparator) comparator.get(m.get(t)));
 		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
+			throw new CloningException("Failed to get the comparator from a tree set", e);
 		}
 		for (Object o : treeSet) {
 			result.add(cloner.deepClone(o, clones));

@@ -14,10 +14,7 @@ public class FastClonerLinkedHashMap implements IFastCloner {
 		final LinkedHashMap<?, ?> al = (LinkedHashMap) t;
 		final LinkedHashMap result = new LinkedHashMap();
 		for (final Map.Entry e : al.entrySet()) {
-			final Object key = cloner.deepClone(e.getKey(), clones);
-			final Object value = cloner.deepClone(e.getValue(), clones);
-
-			result.put(key, value);
+			result.put(cloner.deepClone(e.getKey(), clones), cloner.deepClone(e.getValue(), clones));
 		}
 		return result;
 	}

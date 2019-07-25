@@ -152,13 +152,13 @@ public class Cloner {
 					return;
 				}
 			}
-			throw new RuntimeException("No such field : " + privateFieldName);
+			throw new CloningException("No such field : " + privateFieldName);
 		} catch (final SecurityException e) {
-			throw new RuntimeException(e);
+			throw new CloningException(e);
 		} catch (final IllegalArgumentException e) {
-			throw new RuntimeException(e);
+			throw new CloningException(e);
 		} catch (final IllegalAccessException e) {
-			throw new RuntimeException(e);
+			throw new CloningException(e);
 		}
 	}
 
@@ -523,13 +523,13 @@ public class Cloner {
 
 	private static class IgnoreClassCloner implements IDeepCloner {
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
-			throw new AssertionError("Don't call this directly");
+			throw new CloningException("Don't call this directly");
 		}
 	}
 
 	private static class NullClassCloner implements IDeepCloner {
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
-			throw new AssertionError("Don't call this directly");
+			throw new CloningException("Don't call this directly");
 		}
 	}
 
@@ -613,7 +613,7 @@ public class Cloner {
 				}
 				return newInstance;
 			} catch (IllegalAccessException e) {
-				throw new AssertionError(e);
+				throw new CloningException(e);
 			}
 		}
 	}
@@ -665,9 +665,9 @@ public class Cloner {
 						field.set(dest, fieldObject);
 					}
 				} catch (final IllegalArgumentException e) {
-					throw new RuntimeException(e);
+					throw new CloningException(e);
 				} catch (final IllegalAccessException e) {
-					throw new RuntimeException(e);
+					throw new CloningException(e);
 				}
 			}
 		}

@@ -12,11 +12,11 @@ import java.util.Map;
 public class FastClonerArrayListSubList implements IFastCloner {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public Object clone(final Object t, final IDeepCloner cloner, final Map<Object, Object> clones) {
-		final List al = (List) t;
-		final ArrayList l = new ArrayList(al.size());
-		for (final Object o : al) {
-			final Object cloneInternal = cloner.deepClone(o, clones);
-			l.add(cloneInternal);
+		List al = (List) t;
+		int size = al.size();
+		ArrayList l = new ArrayList(size);
+		for (int i = 0; i < size; i++) {
+			l.add(cloner.deepClone(al.get(i), clones));
 		}
 		return l;
 	}
