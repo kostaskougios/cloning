@@ -404,12 +404,9 @@ public class Cloner {
 	protected <T> T cloneInternal(T o, Map<Object, Object> clones) {
 		if (o == null) return null;
 		if (o == this) return null;
-		if (ignoredInstances.containsKey(o)) return o;
 		if (o instanceof Enum) return o;
-		if (o instanceof IFreezable) {
-			IFreezable f = (IFreezable) o;
-			if (f.isFrozen()) return o;
-		}
+		if (ignoredInstances.containsKey(o)) return o;
+
 		// Prevent cycles, expensive but necessary
 		if (clones != null) {
 			T clone = (T) clones.get(o);
@@ -433,7 +430,9 @@ public class Cloner {
 	}
 
 	private IDeepCloner findDeepCloner(Class<?> clz) {
-		if (nullInstead.contains(clz)) {
+		if (IFreezable.class.isAssignableFrom(clz)) {
+			return new IFreezableCloner(clz);
+		} else if (nullInstead.contains(clz)) {
 			return NULL_CLONER;
 		} else if (ignored.contains(clz)) {
 			return IGNORE_CLONER;
@@ -496,13 +495,15 @@ public class Cloner {
 
 	private class FastClonerCloner implements IDeepCloner {
 		private IFastCloner fastCloner;
+		private IDeepCloner cloneInternal;
 
 		FastClonerCloner(IFastCloner fastCloner) {
 			this.fastCloner = fastCloner;
+			this.cloneInternal = Cloner.this::cloneInternal;
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
-			T clone = (T) fastCloner.clone(o, Cloner.this::cloneInternal, clones);
+			T clone = (T) fastCloner.clone(o, cloneInternal, clones);
 			if (clones != null) clones.put(o, clone);
 			return clone;
 		}
@@ -520,6 +521,23 @@ public class Cloner {
 	private static class NullClassCloner implements IDeepCloner {
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
 			throw new AssertionError("Don't call this directly");
+		}
+	}
+
+	private class IFreezableCloner implements IDeepCloner {
+		IDeepCloner cloner;
+
+		public IFreezableCloner(Class<?> clz) {
+			cloner = new CloneObjectCloner(clz);
+		}
+
+		@Override
+		public <T> T deepClone(T o, Map<Object, Object> clones) {
+			if (o instanceof IFreezable) {
+				IFreezable f = (IFreezable) o;
+				if (f.isFrozen()) return o;
+			}
+			return cloner.deepClone(o, clones);
 		}
 	}
 
