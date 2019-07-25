@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  *         18 Sep 2008
  */
 public class Cloner {
-	private final IInstantiationStrategy instantiationStrategy;
+	private IInstantiationStrategy instantiationStrategy;
 	private final Set<Class<?>> ignored = new HashSet<>();
 	private final Set<Class<?>> ignoredInstanceOf = new HashSet<>();
 	private final Set<Class<?>> nullInstead = new HashSet<>();
@@ -53,7 +53,6 @@ public class Cloner {
 	private boolean cloneSynthetics = true;
 
 	public Cloner() {
-		this.instantiationStrategy = ObjenesisInstantiationStrategy.getInstance();
 		init();
 	}
 
@@ -133,27 +132,23 @@ public class Cloner {
 		return null;
 	}
 
-	public void registerConstant(final Object o) {
+	public void registerConstant(Object o) {
 		ignoredInstances.put(o, true);
 	}
 
-	public void registerConstant(final Class<?> c, final String privateFieldName) {
+	public void registerConstant(Class<?> c, String privateFieldName) {
 		try {
 			List<Field> fields = allFields(c);
 			for (Field field : fields) {
 				if (field.getName().equals(privateFieldName)) {
 					field.setAccessible(true);
 					final Object v = field.get(null);
-					ignoredInstances.put(v, true);
+					registerConstant(v);
 					return;
 				}
 			}
 			throw new RuntimeException("No such field : " + privateFieldName);
-		} catch (final SecurityException e) {
-			throw new RuntimeException(e);
-		} catch (final IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		} catch (final IllegalAccessException e) {
+		} catch (final SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -294,7 +289,7 @@ public class Cloner {
 	 * @param c   the class
 	 * @return a new instance of c
 	 */
-	protected <T> T newInstance(final Class<T> c) {
+	protected <T> T newInstance(Class<T> c) {
 		return instantiationStrategy.newInstance(c);
 	}
 
@@ -403,25 +398,24 @@ public class Cloner {
 		return false;
 	}
 
-	private ConcurrentMap<Class, IDeepCloner> cloners = new ConcurrentHashMap<>();
+	private Map<Class, IDeepCloner> cloners = Collections.synchronizedMap(new HashMap<>());
 
 	@SuppressWarnings("unchecked")
-	protected <T> T cloneInternal(final T o, Map<Object, Object> clones) {
+	protected <T> T cloneInternal(T o, Map<Object, Object> clones) {
 		if (o == null) return null;
 		if (o == this) return null;
-
+		if (ignoredInstances.containsKey(o)) return o;
+		if (o instanceof Enum) return o;
+		if (o instanceof IFreezable) {
+			IFreezable f = (IFreezable) o;
+			if (f.isFrozen()) return o;
+		}
 		// Prevent cycles, expensive but necessary
 		if (clones != null) {
 			T clone = (T) clones.get(o);
 			if (clone != null) {
 				return clone;
 			}
-		}
-
-		if (o instanceof Enum) return o;
-		if (o instanceof IFreezable) {
-			final IFreezable f = (IFreezable) o;
-			if (f.isFrozen()) return o;
 		}
 
 		Class<?> aClass = o.getClass();
@@ -530,7 +524,6 @@ public class Cloner {
 	}
 
 	private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
-	private static final Boolean[] EMPTY_BOOLEAN_ARRAY = new Boolean[0];
 	private static final ReflectionFactory REFLECTION_FACTORY = ReflectionFactory.getReflectionFactory();
 	private static final Constructor OBJECT_CONSTRUCTOR;
 
@@ -546,7 +539,7 @@ public class Cloner {
 
 		private final Constructor constructor;
 		private final Field[] fields;
-		private final Boolean[] shouldClone;
+		private final boolean[] shouldClone;
 		private final int numFields;
 
 		CloneObjectCloner(Class<?> clz) {
@@ -571,8 +564,11 @@ public class Cloner {
 				}
 			} while ((sc = sc.getSuperclass()) != Object.class && sc != null);
 			fields = l.toArray(EMPTY_FIELD_ARRAY);
-			shouldClone = shouldCloneList.toArray(EMPTY_BOOLEAN_ARRAY);
 			numFields = fields.length;
+			shouldClone = new boolean[numFields];
+			for (int i = 0; i < shouldCloneList.size(); i++) {
+				shouldClone[i] = shouldCloneList.get(i);
+			}
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
@@ -580,7 +576,7 @@ public class Cloner {
 				if (dumpCloned != null) {
 					dumpCloned.startCloning(o.getClass());
 				}
-				T newInstance = (T) constructor.newInstance();
+				T newInstance = instantiationStrategy == null ? (T) constructor.newInstance() : instantiationStrategy.newInstance((Class<T>)o.getClass());
 				if (clones != null) {
 					clones.put(o, newInstance);
 					for (int i = 0; i < numFields; i++) {
@@ -652,9 +648,7 @@ public class Cloner {
 					if (destFields.contains(field)) {
 						field.set(dest, fieldObject);
 					}
-				} catch (final IllegalArgumentException e) {
-					throw new RuntimeException(e);
-				} catch (final IllegalAccessException e) {
+				} catch (final IllegalArgumentException | IllegalAccessException e) {
 					throw new RuntimeException(e);
 				}
 			}
