@@ -1,5 +1,7 @@
 package com.rits.cloning;
 
+import org.objenesis.instantiator.ObjectInstantiator;
+
 /**
  * @author kostantinos.kougios
  *
@@ -8,4 +10,5 @@ package com.rits.cloning;
 public interface IInstantiationStrategy
 {
 	<T> T newInstance(final Class<T> c);
+	<T>ObjectInstantiator<T> getInstantiatorOf(Class<T> c);
 }

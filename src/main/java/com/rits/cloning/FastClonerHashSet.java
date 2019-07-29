@@ -16,8 +16,7 @@ public class FastClonerHashSet implements IFastCloner
 		final HashSet l = new HashSet();
 		for (final Object o : al)
 		{
-            final Object cloneInternal = cloner.deepClone(o, clones);
-            l.add(cloneInternal);
+			l.add(cloner.deepClone(o, clones));
 		}
 		return l;
 	}

@@ -16,10 +16,8 @@ public abstract class FastClonerCustomCollection<T extends Collection> implement
     public Object clone(final Object t, final IDeepCloner cloner, final Map<Object, Object> clones) {
 		final T c = getInstance((T) t);
 		final T l = (T) t;
-		for (final Object o : l)
-		{
-            final Object clone = cloner.deepClone(o, clones);
-            c.add(clone);
+		for (final Object o : l) {
+			c.add(cloner.deepClone(o, clones));
 		}
 		return c;
 	}

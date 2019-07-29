@@ -15,11 +15,8 @@ public abstract class FastClonerCustomMap<T extends Map> implements IFastCloner
 		final T m = (T) t;
 		final T result = getInstance((T) t);
 		final Set<Map.Entry<Object, Object>> entrySet = m.entrySet();
-		for (final Map.Entry e : entrySet)
-		{
-            final Object key = cloner.deepClone(e.getKey(), clones);
-            final Object value = cloner.deepClone(e.getValue(), clones);
-            result.put(key, value);
+		for (final Map.Entry e : entrySet) {
+			result.put(cloner.deepClone(e.getKey(), clones), cloner.deepClone(e.getValue(), clones));
 		}
 		return result;
 	}

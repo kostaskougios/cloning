@@ -2,6 +2,7 @@ package com.rits.cloning;
 
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
+import org.objenesis.instantiator.ObjectInstantiator;
 
 /**
  * @author kostantinos.kougios
@@ -15,6 +16,10 @@ public class ObjenesisInstantiationStrategy implements IInstantiationStrategy
 	public <T> T newInstance(Class<T> c)
 	{
 		return objenesis.newInstance(c);
+	}
+
+	public <T>ObjectInstantiator<T> getInstantiatorOf(Class<T> c) {
+		return objenesis.getInstantiatorOf(c);
 	}
 
 	private static ObjenesisInstantiationStrategy	instance	= new ObjenesisInstantiationStrategy();

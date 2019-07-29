@@ -13,8 +13,7 @@ public class FastClonerConcurrentLinkedQueue implements IFastCloner {
 		ConcurrentLinkedQueue q = (ConcurrentLinkedQueue) t;
 		ConcurrentLinkedQueue c = new ConcurrentLinkedQueue();
 		for (Object o : q) {
-			final Object cloneInternal = cloner.deepClone(o, clones);
-			c.add(cloneInternal);
+			c.add(cloner.deepClone(o, clones));
 		}
 		return c;
 	}
