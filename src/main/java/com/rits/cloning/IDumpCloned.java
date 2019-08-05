@@ -3,7 +3,7 @@ package com.rits.cloning;
 import java.lang.reflect.Field;
 
 /**
- * @author: kostas.kougios
+ * @author kostas.kougios
  * Date: 06/08/13
  */
 public interface IDumpCloned

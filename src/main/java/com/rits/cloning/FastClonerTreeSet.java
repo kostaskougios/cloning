@@ -23,6 +23,7 @@ public class FastClonerTreeSet implements IFastCloner {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object clone(Object t, IDeepCloner cloner, Map<Object, Object> clones) {
 		TreeSet treeSet = (TreeSet) t;
 		TreeSet result = null;
