@@ -1,7 +1,6 @@
 package com.rits.cloning;
 
 import org.objenesis.instantiator.ObjectInstantiator;
-import sun.reflect.ReflectionFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -481,7 +480,7 @@ public class Cloner {
 				dumpCloned.startCloning(o.getClass());
 			}
 			int length = Array.getLength(o);
-			T newInstance = (T) Array.newInstance(componentType, length);
+			@SuppressWarnings("unchecked") T newInstance = (T) Array.newInstance(componentType, length);
 			if (clones != null) {
 				clones.put(o, newInstance);
 			}
@@ -512,7 +511,7 @@ public class Cloner {
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
-			T clone = (T) fastCloner.clone(o, cloneInternal, clones);
+			@SuppressWarnings("unchecked") T clone = (T) fastCloner.clone(o, cloneInternal, clones);
 			if (clones != null) clones.put(o, clone);
 			return clone;
 		}
@@ -592,7 +591,7 @@ public class Cloner {
 				if (dumpCloned != null) {
 					dumpCloned.startCloning(o.getClass());
 				}
-				T newInstance = (T) instantiator.newInstance();
+				@SuppressWarnings("unchecked") T newInstance = (T) instantiator.newInstance();
 				if (clones != null) {
 					clones.put(o, newInstance);
 					for (int i = 0; i < numFields; i++) {
