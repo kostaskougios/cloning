@@ -26,6 +26,7 @@ public class Cloner {
 	private final Set<Class<?>> ignored = new HashSet<Class<?>>();
 	private final Set<Class<?>> ignoredInstanceOf = new HashSet<Class<?>>();
 	private final Set<Class<?>> nullInstead = new HashSet<Class<?>>();
+	private final Set<Class<? extends Annotation>> nullInsteadFieldAnnotations = new HashSet<Class<? extends Annotation>>();
 	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<Class<?>, IFastCloner>();
 	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<Class<?>, List<Field>>();
 	private List<ICloningStrategy> cloningStrategies;
@@ -264,6 +265,22 @@ public class Cloner {
 	// spring framework friendly version of nullInsteadOfClone
 	public void setExtraNullInsteadOfClone(final Set<Class<?>> set) {
 		nullInstead.addAll(set);
+	}
+
+	/**
+	 * instead of cloning, fields annotated with this annotations will be set to null
+	 *
+	 * @param a the annotations to nullify during cloning
+	 */
+	public void nullInsteadOfCloneFieldAnnotation(final Class<? extends Annotation>... a) {
+		for (final Class<? extends Annotation> an : a) {
+			nullInsteadFieldAnnotations.add(an);
+		}
+	}
+
+	// spring framework friendly version of nullInsteadOfCloneAnnotation
+	public void setExtraNullInsteadOfCloneFieldAnnotation(final Set<Class<? extends Annotation>> set) {
+		nullInsteadFieldAnnotations.addAll(set);
 	}
 
 	/**
@@ -569,7 +586,7 @@ public class Cloner {
 					}
 					int modifiers = f.getModifiers();
 					if (!Modifier.isStatic(modifiers)) {
-						if (!(nullTransient && Modifier.isTransient(modifiers))) {
+						if (!(nullTransient && Modifier.isTransient(modifiers)) && !isFieldNullInsteadBecauseOfAnnotation(f)) {
 							l.add(f);
 							boolean shouldClone = (cloneSynthetics || !f.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(f));
 							shouldCloneList.add(shouldClone);
@@ -584,6 +601,17 @@ public class Cloner {
 				shouldClone[i] = shouldCloneList.get(i);
 			}
 			instantiator = instantiationStrategy.getInstantiatorOf(clz);
+		}
+
+		private boolean isFieldNullInsteadBecauseOfAnnotation(Field f) {
+			for (Annotation annotation : f.getAnnotations()) {
+				boolean isAnnotatedWithNullInsteadAnnotation =
+						nullInsteadFieldAnnotations.contains(annotation.annotationType());
+				if (isAnnotatedWithNullInsteadAnnotation) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
