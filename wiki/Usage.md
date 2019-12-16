@@ -145,6 +145,14 @@ final Cloner cloner = new Cloner()
 };
 ```
 
+# Null Fields #
+
+If you want to null fields which are annotated by a specific annotation, you can register
+this annotation using the method:
+
+```
+cloner.nullInsteadOfCloneFieldAnnotation(NullAnnotation.class)
+```
 
 # More ... #
 
