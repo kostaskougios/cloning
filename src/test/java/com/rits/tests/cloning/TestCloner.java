@@ -4,10 +4,7 @@ import com.rits.cloning.Cloner;
 import com.rits.cloning.FastClonerHashMap;
 import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.TestCloner.SynthOuter.Inner;
-import com.rits.tests.cloning.domain.A;
-import com.rits.tests.cloning.domain.B;
-import com.rits.tests.cloning.domain.F;
-import com.rits.tests.cloning.domain.G;
+import com.rits.tests.cloning.domain.*;
 import junit.framework.TestCase;
 import org.junit.Assert;
 
@@ -537,6 +534,29 @@ public class TestCloner extends TestCase {
 		assertNotNull(deepClone.tr1);
 		assertNotNull(deepClone.a);
 		assertNotNull(deepClone.nontr);
+	}
+
+	public void testNullInsteadOfClone() {
+		final Cloner c = new Cloner();
+		c.nullInsteadOfClone(A.class);
+
+		G g = new G(new A(), new B());
+		G deepClone = c.deepClone(g);
+
+		assertNotNull(deepClone.getB());
+		assertNull(deepClone.getA());
+	}
+
+	public void testNullInsteadOfCloneAnnotatedFields() {
+		final Cloner c = new Cloner();
+		c.nullInsteadOfCloneFieldAnnotation(TestAnnotation.class);
+
+		E e = new E();
+		E deepClone = c.deepClone(e);
+
+		assertNotNull(deepClone.getA());
+		assertNotSame(e.getA(),deepClone.getA());
+		assertNull(deepClone.getId());
 	}
 
 	public void testCopyPropertiesArrayPrimitive() {
