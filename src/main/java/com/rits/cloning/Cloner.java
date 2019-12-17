@@ -3,7 +3,9 @@ package com.rits.cloning;
 import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -272,7 +274,8 @@ public class Cloner {
 	 *
 	 * @param a the annotations to nullify during cloning
 	 */
-	public void nullInsteadOfCloneFieldAnnotation(final Class<? extends Annotation>... a) {
+	@SafeVarargs
+	final public void nullInsteadOfCloneFieldAnnotation(final Class<? extends Annotation>... a) {
 		for (final Class<? extends Annotation> an : a) {
 			nullInsteadFieldAnnotations.add(an);
 		}
