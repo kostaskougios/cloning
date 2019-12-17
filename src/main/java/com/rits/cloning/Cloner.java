@@ -423,7 +423,7 @@ public class Cloner {
 		return false;
 	}
 
-	private Map<Class, IDeepCloner> cloners = Collections.synchronizedMap(new HashMap<Class, IDeepCloner>());
+	private Map<Class, IDeepCloner> cloners = new ConcurrentHashMap<>();
 
 	@SuppressWarnings("unchecked")
 	protected <T> T cloneInternal(T o, Map<Object, Object> clones) {
