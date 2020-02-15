@@ -790,4 +790,33 @@ public class TestCloner extends TestCase {
 		assertNotSame(list, cloned);
 		assertNotSame(list.peek(), cloned.peek());
 	}
+
+	public void testEnumMapWithNullValue() {
+		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
+		originalMap.put(TestEnum.A, null);
+
+		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
+		assertEquals("Cloned Map not of expected size", 1, clonedMap.size());
+		assertNull("Expected value is null", clonedMap.get(TestEnum.A));
+		assertTrue("Cloned Map doesn't contain key A", clonedMap.containsKey(TestEnum.A));
+		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+	}
+
+	public void testEmptyEnumMap() {
+		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
+		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
+		assertEquals("Cloned Map is not empty", 0, clonedMap.size());
+		assertTrue("Cloned Map is not empty", clonedMap.isEmpty());
+		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+	}
+	
+
+
+	public void testEnumMapWithNonNullValue() {
+		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
+		originalMap.put(TestEnum.A, "Hello");
+		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
+		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+		assertEquals("Cloned EnumMap value not equal to original EnumMap", originalMap.get(TestEnum.A), clonedMap.get(TestEnum.A));
+	}
 }
