@@ -105,6 +105,7 @@ public class Cloner {
 		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
 		fastCloners.put(ConcurrentLinkedQueue.class, new FastClonerConcurrentLinkedQueue());
 		fastCloners.put(EnumMap.class, new FastClonerEnumMap());
+		fastCloners.put(LinkedHashSet.class, new FastClonerLinkedHashSet());
 
 		// register private classes
 		FastClonerArrayListSubList subListCloner = new FastClonerArrayListSubList();
