@@ -791,22 +791,29 @@ public class TestCloner extends TestCase {
 		assertNotSame(list.peek(), cloned.peek());
 	}
 
+	/**
+	 * Test case with EnumMap where one Enum is mapped onto null
+	 */
 	public void testEnumMapWithNullValue() {
 		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
 		originalMap.put(TestEnum.A, null);
 
 		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-		assertTrue("Cloned LinkedHashSet not instanceof EnumMap", clonedMap instanceof EnumMap);
+		assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
 		assertEquals("Cloned Map not of expected size", 1, clonedMap.size());
-		assertNull("Expected value is null", clonedMap.get(TestEnum.A));
+		assertNull("Expected value is null (contains key A)", clonedMap.get(TestEnum.A));
+		assertNull("Expected value is null (doesn't contain key B)", clonedMap.get(TestEnum.B));
 		assertTrue("Cloned Map doesn't contain key A", clonedMap.containsKey(TestEnum.A));
 		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
 	}
 
+	/**
+	 * Test case for an empty EnumMap
+	 */
 	public void testEmptyEnumMap() {
 		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
 		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-		assertTrue("Cloned LinkedHashSet not instanceof EnumMap", clonedMap instanceof EnumMap);
+		assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
 		assertEquals("Cloned Map is not empty", 0, clonedMap.size());
 		assertTrue("Cloned Map is not empty", clonedMap.isEmpty());
 		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
@@ -814,15 +821,41 @@ public class TestCloner extends TestCase {
 	
 
 
+	/**
+	 * Test case for non empty EnumMap
+	 */
 	public void testEnumMapWithNonNullValue() {
 		EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
 		originalMap.put(TestEnum.A, "Hello");
 		EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-		assertTrue("Cloned LinkedHashSet not instanceof EnumMap", clonedMap instanceof EnumMap);
+		assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
 		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
 		assertEquals("Cloned EnumMap value not equal to original EnumMap", originalMap.get(TestEnum.A), clonedMap.get(TestEnum.A));
 	}
 	
+	/**
+	 * Test case for EnumMap with non-null mutable value
+	 * to see if it is deep cloned
+	 */
+	public void testEnumMapWithNonNullMutableValue() {
+		EnumMap<TestEnum, DC> originalMap = new EnumMap<>(TestEnum.class);
+		DC dc = new DC(5);
+		originalMap.put(TestEnum.A, dc);
+		EnumMap<TestEnum, DC> clonedMap = cloner.deepClone(originalMap);
+		assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
+		assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+		
+		DC dc2 = clonedMap.get(TestEnum.A);
+		// Assert references are different
+		assertNotSame("value not cloned", dc, dc2);
+		// Assert both objects are equal
+		assertEquals("Cloned value not equal to original object", dc, dc2);
+		
+	}
+	
+	/**
+	 * Test case for cloning LinkedHashSet
+	 */
 	public void testLinkedHashSetToArray() {
 		Set<Object> set = new LinkedHashSet<>();
 		set.add(new Object());
@@ -837,13 +870,55 @@ public class TestCloner extends TestCase {
 		assertTrue("First element not removed from LinkedHashSet", clonedSet.remove(first));
 	}
 	
+	/**
+	 * Another test case for LinkedHashSet
+	 */
 	public void testLinkedHashSetEquals() {
-		Set<Object> set = new LinkedHashSet<>();
-		set.add("Test 1");
-		set.add("Test 2");
+		LinkedHashSet<String> originalSet = new LinkedHashSet<>();
+		originalSet.add("Test 1");
+		originalSet.add("Test 2");
 
-		Set<Object> clonedSet = cloner.deepClone(set);
-		assertTrue("Cloned LinkedHashSet not instanceof LinkedHashSet", clonedSet instanceof LinkedHashSet);
-		assertEquals("Cloned LinkedHashSet not equal to original one", set, clonedSet);
+		LinkedHashSet<String> clonedSet = cloner.deepClone(originalSet);
+		assertNotSame("Cloned LinkedHashSet same as original one", originalSet, clonedSet);
+		assertEquals("Cloned LinkedHashSet not equal to original one", originalSet, clonedSet);
+	}
+	
+
+	/**
+	 * Test if insertion order of LinkedhashSet is the same
+	 */
+	public void testLinkedHashSetInserationOrder() {
+		LinkedHashSet<Integer> originalSet = new LinkedHashSet<>();
+		for (int i = 1000; i >= 1; i--) {
+			originalSet.add(i);
+		}
+		
+		LinkedHashSet<Integer> clonedSet = cloner.deepClone(originalSet);
+		assertEquals("Cloned LinkedHashSet not equal to original one", originalSet,  clonedSet);
+		int i = 1000;
+		for (Integer act : clonedSet) {
+			assertEquals("LinkedHashSet iteration order not preserved", i--, act.intValue());
+		}
+	}
+	
+	/**
+	 * Tests if LinkedHashSet with mutable value is deep cloned
+	 */
+	public void testLinkedHashSetWithMitableValue() {
+		LinkedHashSet<DC> originalSet = new LinkedHashSet<>();
+		DC dc = new DC(1000);
+		originalSet.add(dc);
+		
+		LinkedHashSet<DC> clonedSet = cloner.deepClone(originalSet);
+		assertEquals("Size of cloned LinkedHashSet is wrong", 1, clonedSet.size());
+		assertNotSame("Cloned LinkedHashSet same as original one", originalSet,  clonedSet);
+		assertEquals("Cloned LinkedHashSet not equal to original one", originalSet,  clonedSet);
+		DC dc2 = clonedSet.iterator().next();
+		// Assert references are different
+		assertNotSame("value not cloned", dc, dc2);
+		// Assert both objects are equal
+		assertEquals("Cloned value not equal to original object", dc, dc2);
+		
 	}
 }
+
