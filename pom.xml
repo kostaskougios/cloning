@@ -9,7 +9,7 @@
 	<groupId>io.github.kostaskougios</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
-	<version>1.10.1</version>
+	<version>1.10.2</version>
 	<name>cloning</name>
 	<url>https://github.com/kostaskougios/cloning/</url>
 	<description><![CDATA[
