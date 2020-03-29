@@ -94,18 +94,18 @@ public class Cloner {
 	 * registers a std set of fast cloners.
 	 */
 	protected void registerFastCloners() {
-		fastCloners.put(GregorianCalendar.class, new FastClonerCalendar());
-		fastCloners.put(ArrayList.class, new FastClonerArrayList());
-		fastCloners.put(LinkedList.class, new FastClonerLinkedList());
-		fastCloners.put(HashSet.class, new FastClonerHashSet());
-		fastCloners.put(HashMap.class, new FastClonerHashMap());
-		fastCloners.put(TreeMap.class, new FastClonerTreeMap());
-		fastCloners.put(TreeSet.class, new FastClonerTreeSet());
-		fastCloners.put(LinkedHashMap.class, new FastClonerLinkedHashMap());
-		fastCloners.put(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
-		fastCloners.put(ConcurrentLinkedQueue.class, new FastClonerConcurrentLinkedQueue());
-		fastCloners.put(EnumMap.class, new FastClonerEnumMap());
-		fastCloners.put(LinkedHashSet.class, new FastClonerLinkedHashSet());
+		registerFastCloner(GregorianCalendar.class, new FastClonerCalendar());
+		registerFastCloner(ArrayList.class, new FastClonerArrayList());
+		registerFastCloner(LinkedList.class, new FastClonerLinkedList());
+		registerFastCloner(HashSet.class, new FastClonerHashSet());
+		registerFastCloner(HashMap.class, new FastClonerHashMap());
+		registerFastCloner(TreeMap.class, new FastClonerTreeMap());
+		registerFastCloner(TreeSet.class, new FastClonerTreeSet());
+		registerFastCloner(LinkedHashMap.class, new FastClonerLinkedHashMap());
+		registerFastCloner(ConcurrentHashMap.class, new FastClonerConcurrentHashMap());
+		registerFastCloner(ConcurrentLinkedQueue.class, new FastClonerConcurrentLinkedQueue());
+		registerFastCloner(EnumMap.class, new FastClonerEnumMap());
+		registerFastCloner(LinkedHashSet.class, new FastClonerLinkedHashSet());
 
 		// register private classes
 		FastClonerArrayListSubList subListCloner = new FastClonerArrayListSubList();
@@ -125,11 +125,7 @@ public class Cloner {
 		}
 	}
 
-	private IDeepCloner deepCloner = new IDeepCloner() {
-		public <T> T deepClone(T o, Map<Object, Object> clones) {
-			return cloneInternal(o, clones);
-		}
-	};
+	private IDeepCloner deepCloner = this::cloneInternal;
 
 	protected Object fastClone(final Object o, final Map<Object, Object> clones) {
 		final Class<? extends Object> c = o.getClass();
@@ -157,11 +153,7 @@ public class Cloner {
 				}
 			}
 			throw new CloningException("No such field : " + privateFieldName);
-		} catch (final SecurityException e) {
-			throw new CloningException(e);
-		} catch (final IllegalArgumentException e) {
-			throw new CloningException(e);
-		} catch (final IllegalAccessException e) {
+		} catch (final SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			throw new CloningException(e);
 		}
 	}

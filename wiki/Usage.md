@@ -111,6 +111,26 @@ cloner.setDumpClonedClasses(true);
 You can manually clone some of your classes to improve cloning performance. Instantiating the class and copying fields might be faster in several cases. Please Check IFastCloner interface and cloner.registerFastCloner(Class c, IFastCloner fastCloner).
 In case you need to clone a custom collection or map, please extend one of the abstract FastClonerCustom**classes.**
 
+Example:
+
+```
+cloner.registerFastCloner(HashMap.class, new FastClonerHashMap());
+
+public class FastClonerHashMap implements IFastCloner
+{
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+    public Object clone(final Object t, final IDeepCloner cloner, final Map<Object, Object> clones) {
+		final HashMap<Object, Object> m = (HashMap) t;
+		final HashMap result = new HashMap();
+		for (final Map.Entry e : m.entrySet()) {
+			result.put(cloner.deepClone(e.getKey(), clones), cloner.deepClone(e.getValue(), clones));
+		}
+		return result;
+	}
+}
+
+```
+
 # Immutable #
 
 Since 1.7.5 there is a new annotation: @Immutable . Marking a class as @Immutable instructs the cloner to avoid cloning it - a performance optimisation. Please check the source of com.rits.cloning.Immutable for further info.
