@@ -3,7 +3,7 @@ The cloning library is a small, open source (Apache licensed) Java library which
 
 Here is an example of its usage:
 
-```
+```java
 Cloner cloner=new Cloner();
 
 MyClass clone=cloner.deepClone(o);
