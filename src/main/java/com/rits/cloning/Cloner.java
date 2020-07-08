@@ -221,7 +221,7 @@ public class Cloner {
 	 * @param set a set of classes which will be scanned for static fields
 	 */
 	public void setExtraStaticFields(final Set<Class<?>> set) {
-		registerStaticFields((Class<?>[]) set.toArray());
+		registerStaticFields(set.toArray(new Class<?>[0]));
 	}
 
 	/**
