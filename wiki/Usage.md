@@ -1,8 +1,16 @@
 # WARNING #
 
-Cloning can be potentially dangerous. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects returned by ORM libraries) means a big graph of objects might be cloned which can lead to performance issues and potential crashes. Always enable cloner's debug mode during development, which will print all cloned classes to the console : cloner.setDumpClonedClasses(true)
+Cloning can be potentially dangerous. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects
+returned by ORM libraries) means a big graph of objects might be cloned which can lead to performance issues and
+potential crashes. Always enable cloner's debug mode during development, which will print all cloned classes to the
+console : cloner.setDumpClonedClasses(true)
 
-# Jdk 9
+# Jdk 8 , 9 and 10
+
+From version 1.11.0, cloner requires jdk 11 or better. Please use an older cloner version if you want to use an older
+jdk.
+
+# Jdk 9 and above
 
 You may get a warning in jdk 9 due to the reflection that the cloning library uses to clone objects:
 
@@ -12,8 +20,13 @@ You may get a warning in jdk 9 due to the reflection that the cloning library us
     WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
     WARNING: All illegal access operations will be denied in a future release
 
+Please use java flag `--illegal-access=permit` to allow usage of cloner.
+
 # Example #
-You can create a single instance of cloner and use it throughout your application to deep clone objects. Once instantiated and configured, then the cloner is thread safe and can be reused, provided it's configuration is not altered.
+
+You can create a single instance of cloner and use it throughout your application to deep clone objects. Once
+instantiated and configured, then the cloner is thread safe and can be reused, provided it's configuration is not
+altered.
 
 i.e.
 
