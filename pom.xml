@@ -53,8 +53,11 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.15</version>
+				<version>3.0.0-M5</version>
 				<configuration>
+					<argLine>
+						--illegal-access=permit
+					</argLine>
 					<includes>
 						<include>**/Test*.java</include>
 					</includes>
