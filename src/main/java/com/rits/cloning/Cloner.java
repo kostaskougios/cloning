@@ -578,15 +578,17 @@ public class Cloner {
 			do {
 				Field[] fs = sc.getDeclaredFields();
 				for (final Field f : fs) {
-					if (!f.isAccessible()) {
-						f.setAccessible(true);
-					}
 					int modifiers = f.getModifiers();
 					if (!Modifier.isStatic(modifiers)) {
 						if (!(nullTransient && Modifier.isTransient(modifiers)) && !isFieldNullInsteadBecauseOfAnnotation(f)) {
 							l.add(f);
 							boolean shouldClone = (cloneSynthetics || !f.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(f));
 							shouldCloneList.add(shouldClone);
+							if (shouldClone) {
+								if (!f.isAccessible()) {
+									f.setAccessible(true);
+								}
+							}
 						}
 					}
 				}
