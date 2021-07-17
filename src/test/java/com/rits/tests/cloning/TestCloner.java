@@ -908,5 +908,11 @@ public class TestCloner extends TestCase {
         assertEquals("Cloned value not equal to original object", dc, dc2);
 
     }
+    
+    public void testStaticTransientMembers() {
+       class StaticTransient extends ArrayList<String> {};
+        
+       cloner.deepClone(new StaticTransient());
+    }
 }
 
