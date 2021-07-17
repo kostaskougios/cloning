@@ -892,7 +892,7 @@ public class TestCloner extends TestCase {
     /**
      * Tests if LinkedHashSet with mutable value is deep cloned
      */
-    public void testLinkedHashSetWithMitableValue() {
+    public void testLinkedHashSetWithMutableValue() {
         LinkedHashSet<DC> originalSet = new LinkedHashSet<>();
         DC dc = new DC(1000);
         originalSet.add(dc);
@@ -908,11 +908,22 @@ public class TestCloner extends TestCase {
         assertEquals("Cloned value not equal to original object", dc, dc2);
 
     }
-    
+
+    public static class StaticTransient extends ArrayList<String> {
+    }
+
+    ;
+
+    public void testStaticTransient() {
+        cloner.deepClone(new StaticTransient());
+    }
+
     public void testStaticTransientMembers() {
-       class StaticTransient extends ArrayList<String> {};
-        
-       cloner.deepClone(new StaticTransient());
+        class StaticTransient extends ArrayList<String> {
+        }
+        ;
+
+        cloner.deepClone(new StaticTransient());
     }
 }
 
