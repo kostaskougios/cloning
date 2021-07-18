@@ -909,19 +909,9 @@ public class TestCloner extends TestCase {
 
     }
 
-    public static class StaticTransient extends ArrayList<String> {
-    }
-
-    ;
-
     public void testStaticTransient() {
-        cloner.deepClone(new StaticTransient());
-    }
-
-    public void testStaticTransientMembers() {
         class StaticTransient extends ArrayList<String> {
         }
-        ;
 
         cloner.deepClone(new StaticTransient());
     }
