@@ -10,8 +10,10 @@ import org.junit.Assert;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -914,6 +916,12 @@ public class TestCloner extends TestCase {
         }
 
         cloner.deepClone(new StaticTransient());
+    }
+
+    public void ignoreTestLambda() {
+        // this fails with "Caused by: java.lang.ClassNotFoundException: com.rits.tests.cloning.TestCloner$$Lambda$54.0x0000000800c24210"
+        Function<ZonedDateTime, Integer> f = ZonedDateTime::getNano;
+        cloner.deepClone(f);
     }
 }
 
