@@ -42,6 +42,14 @@ public class TestCloner extends TestCase {
     static private class MyAX {
     }
 
+    public void testCloneListOf12(){
+        Assert.assertEquals(1, cloner.deepClone(List.of(1)).size());
+    }
+
+    public void testCloneSetOf12(){
+        Assert.assertEquals(1, cloner.deepClone(Set.of(1)).size());
+    }
+
     public void testCalendarTimezone() {
         TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
         Calendar c = Calendar.getInstance(timeZone);

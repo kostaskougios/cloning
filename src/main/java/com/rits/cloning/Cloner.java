@@ -5,6 +5,7 @@ import org.objenesis.instantiator.ObjectInstantiator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -113,6 +114,10 @@ public class Cloner {
 		registerInaccessibleClassToBeFastCloned("java.util.ArrayList$SubList", subListCloner);
 		registerInaccessibleClassToBeFastCloned("java.util.SubList", subListCloner);
 		registerInaccessibleClassToBeFastCloned("java.util.RandomAccessSubList", subListCloner);
+		FastClonerListOf12 listOf12 = new FastClonerListOf12();
+		registerInaccessibleClassToBeFastCloned("java.util.ImmutableCollections$List12",listOf12);
+		FastClonerSetOf12 setOf12 = new FastClonerSetOf12();
+		registerInaccessibleClassToBeFastCloned("java.util.ImmutableCollections$Set12",setOf12);
 	}
 
 	protected void registerInaccessibleClassToBeFastCloned(String className, IFastCloner fastCloner) {
