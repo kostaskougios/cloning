@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -922,6 +923,17 @@ public class TestCloner extends TestCase {
         // this fails with "Caused by: java.lang.ClassNotFoundException: com.rits.tests.cloning.TestCloner$$Lambda$54.0x0000000800c24210"
         Function<ZonedDateTime, Integer> f = ZonedDateTime::getNano;
         cloner.deepClone(f);
+    }
+
+    private static class ClassWithEnum {
+        TimeUnit timeUnit;
+    }
+
+    public void testClassWithEnum() {
+        ClassWithEnum a = new ClassWithEnum();
+        a.timeUnit = TimeUnit.SECONDS;
+        ClassWithEnum b = cloner.deepClone(a);
+        assertSame(TimeUnit.SECONDS, b.timeUnit);
     }
 }
 
