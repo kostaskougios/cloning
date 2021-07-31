@@ -878,7 +878,7 @@ public class TestCloner extends TestCase {
     /**
      * Test if insertion order of LinkedhashSet is the same
      */
-    public void testLinkedHashSetInserationOrder() {
+    public void testLinkedHashSetIterationOrder() {
         LinkedHashSet<Integer> originalSet = new LinkedHashSet<>();
         for (int i = 1000; i >= 1; i--) {
             originalSet.add(i);
