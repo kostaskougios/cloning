@@ -39,12 +39,22 @@ public class TestCloner extends TestCase {
     static private class MyAX {
     }
 
-    public void testCloneListOf12(){
-        Assert.assertEquals(1, cloner.deepClone(List.of(1)).size());
+    public void testCloneListOf12() {
+        List list1 = List.of(1);
+        Assert.assertEquals(list1, cloner.deepClone(list1));
+        Assert.assertEquals(1, cloner.deepClone(list1).size());
+        List list2 = List.of(1, 2);
+        Assert.assertEquals(list2, cloner.deepClone(list2));
+        Assert.assertEquals(2, cloner.deepClone(list2).size());
     }
 
-    public void testCloneSetOf12(){
-        Assert.assertEquals(1, cloner.deepClone(Set.of(1)).size());
+    public void testCloneSetOf12() {
+        Set set1 = Set.of(1);
+        Assert.assertEquals(set1, cloner.deepClone(set1));
+        Assert.assertEquals(1, cloner.deepClone(set1).size());
+        Set set2 = Set.of(1, 2);
+        Assert.assertEquals(set2, cloner.deepClone(set2));
+        Assert.assertEquals(2, cloner.deepClone(set2).size());
     }
 
     public void testCalendarTimezone() {
