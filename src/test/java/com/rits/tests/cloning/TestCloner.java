@@ -919,10 +919,12 @@ public class TestCloner extends TestCase {
         cloner.deepClone(new StaticTransient());
     }
 
-    public void ignoreTestLambda() {
+    public void testLambda() {
         // this fails with "Caused by: java.lang.ClassNotFoundException: com.rits.tests.cloning.TestCloner$$Lambda$54.0x0000000800c24210"
+        // It passes on adopt-openjdk9 v16
         Function<ZonedDateTime, Integer> f = ZonedDateTime::getNano;
-        cloner.deepClone(f);
+        Function<ZonedDateTime, Integer> cloned = cloner.deepClone(f);
+        assertNotSame(f, cloned);
     }
 
     private static class ClassWithEnum {
