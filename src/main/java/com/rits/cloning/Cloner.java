@@ -670,6 +670,8 @@ public class Cloner {
 	 *
 	 * @param src  the source object
 	 * @param dest the destination object which must contain as minimum all the fields of src
+	 * @param <T> Source class type
+	 * @param <E> Destination class type
 	 */
 	public <T, E extends T> void copyPropertiesOfInheritedClass(final T src, final E dest) {
 		if (src == null) throw new IllegalArgumentException("src can't be null");
@@ -719,6 +721,8 @@ public class Cloner {
 
 	/**
 	 * reflection utils, override this to choose which fields to clone
+	 * @param c class to get fields from
+	 * @return List of relevant fields in that class
 	 */
 	protected List<Field> allFields(final Class<?> c) {
 		List<Field> l = fieldsCache.get(c);
@@ -770,6 +774,7 @@ public class Cloner {
 
 	/**
 	 * if false, anonymous classes parent class won't be cloned. Default is true
+	 * @param cloneAnonymousParent Whether to clone anonymous parent classes
 	 */
 	public void setCloneAnonymousParent(final boolean cloneAnonymousParent) {
 		this.cloneAnonymousParent = cloneAnonymousParent;
