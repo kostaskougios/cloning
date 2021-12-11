@@ -189,4 +189,4 @@ cloner.nullInsteadOfCloneFieldAnnotation(NullAnnotation.class)
 
 # More ... #
 
-Can be found by looking at the test cases : https://github.com/kostaskougios/cloning/tree/master/src/test/java/com/rits/tests/cloning
+Can be found by looking [at the test cases](src/test/java/com/rits/tests/cloning)
