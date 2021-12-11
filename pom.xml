@@ -83,8 +83,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<source>8</source>
-							<additionalparam>-Xdoclint:none</additionalparam>
+							<source>11</source>
 						</configuration>
 					</execution>
 				</executions>
