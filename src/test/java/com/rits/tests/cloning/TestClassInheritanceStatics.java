@@ -1,7 +1,7 @@
 package com.rits.tests.cloning;
 
 import com.rits.cloning.Cloner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author kostas.kougios

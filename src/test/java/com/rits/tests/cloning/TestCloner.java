@@ -5,8 +5,8 @@ import com.rits.cloning.FastClonerHashMap;
 import com.rits.cloning.Immutable;
 import com.rits.tests.cloning.TestCloner.SynthOuter.Inner;
 import com.rits.tests.cloning.domain.*;
-import junit.framework.TestCase;
-import org.junit.Assert;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -18,14 +18,14 @@ import java.util.function.Function;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author kostantinos.kougios
  * <p>
  * 18 Sep 2008
  */
-public class TestCloner extends TestCase {
+public class TestCloner {
     private final Cloner cloner = new Cloner();
 
     {
@@ -42,15 +42,17 @@ public class TestCloner extends TestCase {
     static private class MyAX {
     }
 
+    @Test
     public void testCloneListOf12() {
         List<Integer> list1 = List.of(1);
         assertEquals(list1, cloner.deepClone(list1));
-        Assert.assertEquals(1, cloner.deepClone(list1).size());
+        assertEquals(1, cloner.deepClone(list1).size());
         List<Integer> list2 = List.of(1, 2);
         assertEquals(list2, cloner.deepClone(list2));
         assertEquals(2, cloner.deepClone(list2).size());
     }
 
+    @Test
     public void testCloneSetOf12() {
         Set<Integer> set1 = Set.of(1);
         assertEquals(set1, cloner.deepClone(set1));
@@ -60,6 +62,7 @@ public class TestCloner extends TestCase {
         assertEquals(2, cloner.deepClone(set2).size());
     }
 
+    @Test
     public void testCalendarTimezone() {
         TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
         Calendar c = Calendar.getInstance(timeZone);
@@ -67,6 +70,7 @@ public class TestCloner extends TestCase {
         assertEquals(timeZone, cloned.getTimeZone());
     }
 
+    @Test
     public void testCloneEnumInMapIssue20() {
         Map<Integer, TestEnum> m = new HashMap<>();
         m.put(1, TestEnum.A);
@@ -79,6 +83,7 @@ public class TestCloner extends TestCase {
         assertSame(clone.get(3), TestEnum.C);
     }
 
+    @Test
     public void testCustomAnnotation() {
         final Cloner cloner = new Cloner() {
             @Override
@@ -91,6 +96,7 @@ public class TestCloner extends TestCase {
         assertSame(o, c);
     }
 
+    @Test
     public void testConsiderImmutable() {
         final Cloner cloner = new Cloner() {
             @Override
@@ -124,6 +130,7 @@ public class TestCloner extends TestCase {
     static public class BTestImmutableSubclass extends BTestImmutable {
     }
 
+    @Test
     public void testIssue7() {
         final HashMap<Object, Object> source = new HashMap<>();
         source.put("string", "string");
@@ -132,6 +139,7 @@ public class TestCloner extends TestCase {
         assertEquals("string", sc.get("string"));
     }
 
+    @Test
     public void testIgnoreInstanceOf() {
         final Cloner cloner = new Cloner();
         cloner.dontCloneInstanceOf(A.class);
@@ -142,18 +150,21 @@ public class TestCloner extends TestCase {
         assertSame(a, cloner.deepClone(a));
     }
 
+    @Test
     public void testImmutableSubclassNotEnabled() {
         final BTestImmutableSubclass a = new BTestImmutableSubclass();
         final BTestImmutableSubclass ca = cloner.deepClone(a);
         assertNotSame(a, ca);
     }
 
+    @Test
     public void testImmutableSubclass() {
         final ATestImmutableSubclass a = new ATestImmutableSubclass();
         assertSame(a, cloner.deepClone(a));
         assertSame(a, cloner.deepClone(a));
     }
 
+    @Test
     public void testImmutable() {
         final ATestImmutable a = new ATestImmutable();
         assertSame(a, cloner.deepClone(a));
@@ -165,6 +176,7 @@ public class TestCloner extends TestCase {
      * if a reference to the same object exists twice, the cloned object
      * will have only 1 clone and references to this clone.
      */
+    @Test
     public void testCloningOfSameObject() {
         final Object o1 = new Object();
         final Object o2 = new Object();
@@ -196,6 +208,7 @@ public class TestCloner extends TestCase {
     /**
      * tests if immutable clone is the same instance
      */
+    @Test
     public void testCloneImmutables() {
         final String s = "test1";
         final String clone1 = cloner.deepClone(s);
@@ -205,6 +218,7 @@ public class TestCloner extends TestCase {
     /**
      * tests if immutable clone is the same instance
      */
+    @Test
     public void testCloneFloat() {
         final Float float1 = 8F;
         final Float cloned = cloner.deepClone(float1);
@@ -215,6 +229,7 @@ public class TestCloner extends TestCase {
     /**
      * tests if arrays are cloned correctly
      */
+    @Test
     public void testCloneArrays() {
         final int[] ia = {1, 2, 3};
         final int[] cloned = cloner.deepClone(ia);
@@ -272,6 +287,7 @@ public class TestCloner extends TestCase {
     /**
      * tests cloning of a simple class
      */
+    @Test
     public void testCloneSimple() {
         final Simple simple = new Simple();
         simple.setS("x1");
@@ -326,6 +342,7 @@ public class TestCloner extends TestCase {
     /**
      * test cloning of a complex object graph
      */
+    @Test
     public void testCloneComplex() {
         final Complex complex = new Complex();
         complex.setS("x1");
@@ -344,6 +361,7 @@ public class TestCloner extends TestCase {
         assertEquals(simple2, simple2Clone);
     }
 
+    @Test
     public void testShallowClone() {
         final Simple simple1 = new Simple();
         final Complex complex = new Complex();
@@ -362,6 +380,7 @@ public class TestCloner extends TestCase {
         assertTrue(shallowClone.getS() != simple1.getS());
     }
 
+    @Test
     public void testCloneStack() {
         final List<Integer> lst = new LinkedList<>();
         for (int i = 0; i < 100000; i++) {
@@ -371,6 +390,7 @@ public class TestCloner extends TestCase {
         assertEquals(lst.size(), clone.size());
     }
 
+    @Test
     public void testCloneTreeSet() {
         final TreeSet<DC> set = new TreeSet<>();
         final DC dc1 = new DC(5);
@@ -392,6 +412,7 @@ public class TestCloner extends TestCase {
         assertEquals(1, set2.size());
     }
 
+    @Test
     public void testCloneHashSet() {
         Set<DC> set = new HashSet<>();
         final DC dc1 = new DC(5);
@@ -413,6 +434,7 @@ public class TestCloner extends TestCase {
         assertEquals(1, set.size());
     }
 
+    @Test
     public void testCloneStability() {
         for (int i = 0; i < 10; i++) {
             final Complex complex = new Complex();
@@ -438,6 +460,7 @@ public class TestCloner extends TestCase {
         }
     }
 
+    @Test
     public void testArrayListCloning() {
         final ArrayList<Object> l = new ArrayList<>();
         l.add(Calendar.getInstance());
@@ -460,6 +483,7 @@ public class TestCloner extends TestCase {
         assertEquals(5, l.size());
     }
 
+    @Test
     public void testLinkedListCloning() {
         final LinkedList<Object> l = new LinkedList<>();
         l.add(Calendar.getInstance());
@@ -482,6 +506,7 @@ public class TestCloner extends TestCase {
         assertEquals(5, l.size());
     }
 
+    @Test
     public void testHashSetCloning() {
         final HashSet<Object> l = new HashSet<>();
         l.add(Calendar.getInstance());
@@ -497,6 +522,7 @@ public class TestCloner extends TestCase {
         }
     }
 
+    @Test
     public void testHashMapCloning() {
         final HashMap<String, Object> m = new HashMap<>();
         m.put("kostas", Calendar.getInstance());
@@ -515,6 +541,7 @@ public class TestCloner extends TestCase {
         assertEquals(4, cloned.size());
     }
 
+    @Test
     public void testTreeMapCloning() {
         final TreeMap<String, Object> m = new TreeMap<>();
         m.put("kostas", Calendar.getInstance());
@@ -533,6 +560,7 @@ public class TestCloner extends TestCase {
         assertEquals(4, cloned.size());
     }
 
+    @Test
     public void testTransientNullPositive() {
         final Cloner c = new Cloner();
         c.setNullTransient(true);
@@ -544,6 +572,7 @@ public class TestCloner extends TestCase {
         assertNotNull(deepClone.nontr);
     }
 
+    @Test
     public void testTransientNullNegative() {
         final Cloner c = new Cloner();
         c.setNullTransient(false);
@@ -554,6 +583,7 @@ public class TestCloner extends TestCase {
         assertNotNull(deepClone.nontr);
     }
 
+    @Test
     public void testNullInsteadOfClone() {
         final Cloner c = new Cloner();
         c.nullInsteadOfClone(A.class);
@@ -565,6 +595,7 @@ public class TestCloner extends TestCase {
         assertNull(deepClone.getA());
     }
 
+    @Test
     public void testNullInsteadOfCloneAnnotatedFields() {
         final Cloner c = new Cloner();
         c.nullInsteadOfCloneFieldAnnotation(TestAnnotation.class);
@@ -577,6 +608,7 @@ public class TestCloner extends TestCase {
         assertNull(deepClone.getId());
     }
 
+    @Test
     public void testCopyPropertiesArrayPrimitive() {
         final int[] src = new int[]{5, 6, 7};
         final int[] dest = new int[3];
@@ -586,6 +618,7 @@ public class TestCloner extends TestCase {
         assertEquals(src[2], dest[2]);
     }
 
+    @Test
     public void testCopyPropertiesArray() {
         final Object[] src = new Object[]{5, 8.5f, 3.5d};
         final Object[] dest = new Object[3];
@@ -595,6 +628,7 @@ public class TestCloner extends TestCase {
         assertEquals(src[2], dest[2]);
     }
 
+    @Test
     public void testCopyPropertiesInheritedClasses() {
         final A a = new A();
         final B b = new B();
@@ -608,6 +642,7 @@ public class TestCloner extends TestCase {
         assertEquals(10, b.getY());
     }
 
+    @Test
     public void testFreezable() {
         final F f = new F();
         assertNotSame(f, cloner.deepClone(f));
@@ -615,6 +650,7 @@ public class TestCloner extends TestCase {
         assertSame(f, cloner.deepClone(f));
     }
 
+    @Test
     public void testDeepCloneDontCloneInstances() {
         final A a = new A();
         final B b = new B();
@@ -644,6 +680,7 @@ public class TestCloner extends TestCase {
         }
     }
 
+    @Test
     public void testDontCloneSynthetic() {
         final Cloner cloner = new Cloner();
         cloner.setCloneSynthetics(false);
@@ -655,6 +692,7 @@ public class TestCloner extends TestCase {
         assertSame(outer, clonedInner.getOuter());
     }
 
+    @Test
     public void testTreeMapWithComparator() {
         final TreeMap<Object, String> m = new TreeMap<>(Comparator.comparingInt(Object::hashCode));
         m.put(new Object() {
@@ -674,6 +712,7 @@ public class TestCloner extends TestCase {
         assertEquals(m, clone);
     }
 
+    @Test
     public void testTreeSetWithComparator() {
         final TreeSet<Object> set = new TreeSet<>(Comparator.comparingInt(Object::hashCode));
 
@@ -694,12 +733,14 @@ public class TestCloner extends TestCase {
         assertEquals(set, clone);
     }
 
+    @Test
     public void testEnumIssue9() {
         final TestEnum original = TestEnum.A;
         final TestEnum clone = cloner.deepClone(original);
         assertSame(clone, original);
     }
 
+    @Test
     public void testDate() {
         Date original = new Date();
         Cloner cloner = new Cloner();
@@ -710,18 +751,21 @@ public class TestCloner extends TestCase {
         assertEquals(0, clone.getTime());
     }
 
+    @Test
     public void testUnregisterFastCloner() {
         Cloner cloner = new Cloner();
         cloner.unregisterFastCloner(HashMap.class);
         cloner.registerFastCloner(HashMap.class, new FastClonerHashMap());
     }
 
+    @Test
     public void testEmptyLinkedHashMap() {
         LinkedHashMap<Integer, Integer> m = new LinkedHashMap<>();
         LinkedHashMap<Integer, Integer> cloned = cloner.deepClone(m);
         assertEquals(m, cloned);
     }
 
+    @Test
     public void testLinkedHashMap() {
         LinkedHashMap<Integer, Integer> m = new LinkedHashMap<>();
         for (int i = 1; i < 10000; i++) {
@@ -731,6 +775,7 @@ public class TestCloner extends TestCase {
         assertEquals(m, cloned);
     }
 
+    @Test
     public void testLinkedHashMapIterationOrder() {
         LinkedHashMap<Integer, Integer> m = new LinkedHashMap<>();
         for (int i = 1000; i >= 1; i--) {
@@ -743,6 +788,7 @@ public class TestCloner extends TestCase {
         }
     }
 
+    @Test
     public void testCloneArrayListSubList() {
         List<String> a = new ArrayList<>();
         a.add("1");
@@ -759,6 +805,7 @@ public class TestCloner extends TestCase {
         assertEquals(1, cloner.deepClone(b).size()); // throws ConcurrentModificationException
     }
 
+    @Test
     public void testCloneLinkedListSubList() {
         List<String> a = new LinkedList<>();
         a.add("1");
@@ -788,6 +835,7 @@ public class TestCloner extends TestCase {
 //		cIt.next(); // throws ConcurrentModificationException
 //	}
 
+    @Test
     public void testConcurrentLinkedQueue() {
         ConcurrentLinkedQueue<A> list = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < 3000; ++i) {
@@ -796,7 +844,7 @@ public class TestCloner extends TestCase {
             list.add(a);
         }
         ConcurrentLinkedQueue<A> cloned = cloner.deepClone(list);// StackOverflowError
-        Assert.assertArrayEquals(list.toArray(), cloned.toArray());
+        assertArrayEquals(list.toArray(), cloned.toArray());
         assertNotSame(list, cloned);
         assertNotSame(list.peek(), cloned.peek());
     }
@@ -804,98 +852,105 @@ public class TestCloner extends TestCase {
     /**
      * Test case with EnumMap where one Enum is mapped onto null
      */
+    @Test
     public void testEnumMapWithNullValue() {
         EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
         originalMap.put(TestEnum.A, null);
 
         EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-        assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
-        assertEquals("Cloned Map not of expected size", 1, clonedMap.size());
-        assertNull("Expected value is null (contains key A)", clonedMap.get(TestEnum.A));
-        assertNull("Expected value is null (doesn't contain key B)", clonedMap.get(TestEnum.B));
-        assertTrue("Cloned Map doesn't contain key A", clonedMap.containsKey(TestEnum.A));
-        assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+        assertNotSame(originalMap, clonedMap, "Cloned EnumMap same as original EnumMap");
+        assertEquals(1, clonedMap.size(), "Cloned Map not of expected size");
+        assertNull(clonedMap.get(TestEnum.A), "Expected value is null (contains key A)");
+        assertNull(clonedMap.get(TestEnum.B), "Expected value is null (doesn't contain key B)");
+        assertTrue(clonedMap.containsKey(TestEnum.A), "Cloned Map doesn't contain key A");
+        assertEquals(originalMap, clonedMap, "Cloned EnumMap not equal to original EnumMap");
     }
 
     /**
      * Test case for an empty EnumMap
      */
+    @Test
     public void testEmptyEnumMap() {
         EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
         EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-        assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
-        assertEquals("Cloned Map is not empty", 0, clonedMap.size());
-        assertTrue("Cloned Map is not empty", clonedMap.isEmpty());
-        assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+        assertNotSame(originalMap, clonedMap, "Cloned EnumMap same as original EnumMap");
+        assertEquals(0, clonedMap.size(), "Cloned Map is not empty");
+        assertTrue(clonedMap.isEmpty(), "Cloned Map is not empty");
+        assertEquals(originalMap, clonedMap, "Cloned EnumMap not equal to original EnumMap");
     }
 
 
     /**
      * Test case for non empty EnumMap
      */
+    @Test
     public void testEnumMapWithNonNullValue() {
         EnumMap<TestEnum, String> originalMap = new EnumMap<>(TestEnum.class);
         originalMap.put(TestEnum.A, "Hello");
         EnumMap<TestEnum, String> clonedMap = cloner.deepClone(originalMap);
-        assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
-        assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
-        assertEquals("Cloned EnumMap value not equal to original EnumMap", originalMap.get(TestEnum.A), clonedMap.get(TestEnum.A));
+        assertNotSame(originalMap, clonedMap, "Cloned EnumMap not equal to original EnumMap");
+        assertEquals(originalMap, clonedMap, "Cloned EnumMap not equal to original EnumMap");
+        assertEquals(originalMap.get(TestEnum.A), clonedMap.get(TestEnum.A), "Cloned EnumMap value not equal to original EnumMap");
     }
 
     /**
      * Test case for EnumMap with non-null mutable value
      * to see if it is deep cloned
      */
+    @Test
     public void testEnumMapWithNonNullMutableValue() {
         EnumMap<TestEnum, DC> originalMap = new EnumMap<>(TestEnum.class);
         DC dc = new DC(5);
         originalMap.put(TestEnum.A, dc);
         EnumMap<TestEnum, DC> clonedMap = cloner.deepClone(originalMap);
-        assertNotSame("Cloned EnumMap same as original EnumMap", originalMap, clonedMap);
-        assertEquals("Cloned EnumMap not equal to original EnumMap", originalMap, clonedMap);
+        assertNotSame(originalMap, clonedMap, "Cloned EnumMap value not equal to original EnumMap");
+        assertEquals(originalMap, clonedMap, "Cloned EnumMap not equal to original EnumMap");
 
         DC dc2 = clonedMap.get(TestEnum.A);
         // Assert references are different
-        assertNotSame("value not cloned", dc, dc2);
+        assertNotSame(dc, dc2, "value not cloned");
         // Assert both objects are equal
-        assertEquals("Cloned value not equal to original object", dc, dc2);
+        assertEquals(dc, dc2, "Cloned value not equal to original object");
 
     }
 
     /**
      * Test case for cloning LinkedHashSet
      */
+    @Test
     public void testLinkedHashSetToArray() {
         Set<Object> set = new LinkedHashSet<>();
         set.add(new Object());
         set.add(new Object());
 
         Set<Object> clonedSet = cloner.deepClone(set);
-        assertTrue("Cloned LinkedHashSet not instanceof LinkedHashSet", clonedSet instanceof LinkedHashSet);
+        assertTrue(clonedSet instanceof LinkedHashSet, "Cloned LinkedHashSet not instanceof LinkedHashSet");
 
 
         Object first = clonedSet.toArray()[0];
-        assertTrue("First element not contained in cloned LinkedHashSet", clonedSet.contains(first));
-        assertTrue("First element not removed from LinkedHashSet", clonedSet.remove(first));
+        assertTrue(clonedSet.contains(first), "First element not contained in cloned LinkedHashSet");
+        assertTrue(clonedSet.remove(first), "First element not removed from LinkedHashSet");
     }
 
     /**
      * Another test case for LinkedHashSet
      */
+    @Test
     public void testLinkedHashSetEquals() {
         LinkedHashSet<String> originalSet = new LinkedHashSet<>();
         originalSet.add("Test 1");
         originalSet.add("Test 2");
 
         LinkedHashSet<String> clonedSet = cloner.deepClone(originalSet);
-        assertNotSame("Cloned LinkedHashSet same as original one", originalSet, clonedSet);
-        assertEquals("Cloned LinkedHashSet not equal to original one", originalSet, clonedSet);
+        assertNotSame(originalSet, clonedSet, "Cloned LinkedHashSet same as original one");
+        assertEquals(originalSet, clonedSet, "Cloned LinkedHashSet not equal to original one");
     }
 
 
     /**
      * Test if insertion order of LinkedhashSet is the same
      */
+    @Test
     public void testLinkedHashSetIterationOrder() {
         LinkedHashSet<Integer> originalSet = new LinkedHashSet<>();
         for (int i = 1000; i >= 1; i--) {
@@ -903,33 +958,35 @@ public class TestCloner extends TestCase {
         }
 
         LinkedHashSet<Integer> clonedSet = cloner.deepClone(originalSet);
-        assertEquals("Cloned LinkedHashSet not equal to original one", originalSet, clonedSet);
+        assertEquals(originalSet, clonedSet, "Cloned LinkedHashSet not equal to original one");
         int i = 1000;
         for (Integer act : clonedSet) {
-            assertEquals("LinkedHashSet iteration order not preserved", i--, act.intValue());
+            assertEquals(i--, act.intValue(), "LinkedHashSet iteration order not preserved");
         }
     }
 
     /**
      * Tests if LinkedHashSet with mutable value is deep cloned
      */
+    @Test
     public void testLinkedHashSetWithMutableValue() {
         LinkedHashSet<DC> originalSet = new LinkedHashSet<>();
         DC dc = new DC(1000);
         originalSet.add(dc);
 
         LinkedHashSet<DC> clonedSet = cloner.deepClone(originalSet);
-        assertEquals("Size of cloned LinkedHashSet is wrong", 1, clonedSet.size());
-        assertNotSame("Cloned LinkedHashSet same as original one", originalSet, clonedSet);
-        assertEquals("Cloned LinkedHashSet not equal to original one", originalSet, clonedSet);
+        assertEquals(1, clonedSet.size(), "Size of cloned LinkedHashSet is wrong");
+        assertNotSame(originalSet, clonedSet, "Cloned LinkedHashSet same as original one");
+        assertEquals(originalSet, clonedSet, "Cloned LinkedHashSet not equal to original one");
         DC dc2 = clonedSet.iterator().next();
         // Assert references are different
-        assertNotSame("value not cloned", dc, dc2);
+        assertNotSame(dc, dc2, "value not cloned");
         // Assert both objects are equal
-        assertEquals("Cloned value not equal to original object", dc, dc2);
+        assertEquals(dc, dc2, "Cloned value not equal to original object");
 
     }
 
+    @Test
     public void testStaticTransient() {
         class StaticTransient extends ArrayList<String> {
         }
@@ -937,9 +994,9 @@ public class TestCloner extends TestCase {
         cloner.deepClone(new StaticTransient());
     }
 
-    public void ignoreTestLambda() {
-        // this fails with "Caused by: java.lang.ClassNotFoundException: com.rits.tests.cloning.TestCloner$$Lambda$54.0x0000000800c24210"
-        // It passes only on adopt-openjdk9 v16
+    @Test
+    @Disabled("this fails with Caused by: java.lang.ClassNotFoundException: com.rits.tests.cloning.TestCloner$$Lambda$54.0x0000000800c24210 It passes only on adopt-openjdk9 v16")
+    public void testLambda() {
         Function<ZonedDateTime, Integer> f = ZonedDateTime::getNano;
         Function<ZonedDateTime, Integer> cloned = cloner.deepClone(f);
         assertNotSame(f, cloned);
@@ -949,6 +1006,7 @@ public class TestCloner extends TestCase {
         TimeUnit timeUnit;
     }
 
+    @Test
     public void testClassWithEnum() {
         ClassWithEnum a = new ClassWithEnum();
         a.timeUnit = TimeUnit.SECONDS;

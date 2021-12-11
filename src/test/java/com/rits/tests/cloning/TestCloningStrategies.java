@@ -3,14 +3,15 @@ package com.rits.tests.cloning;
 import com.rits.cloning.Cloner;
 import com.rits.cloning.CloningStrategyFactory;
 import com.rits.cloning.ICloningStrategy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TestCloningStrategies {
 

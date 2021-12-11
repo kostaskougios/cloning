@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
-import junit.extensions.ActiveTestSuite;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import com.rits.cloning.Cloner;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * test thread safety of cloner
@@ -22,10 +22,12 @@ import com.rits.cloning.Cloner;
  *
  * 18 Jan 2009
  */
-public class TestClonerThreadSafety extends TestCase
+public class TestClonerThreadSafety
 {
 	private static final Cloner	cloner	= new Cloner(); // use 1 cloner for all tests (all threads)
 
+	@Execution(ExecutionMode.CONCURRENT)
+	@RepeatedTest(80)
 	public void testCloner()
 	{
 		final Random r = new Random();
@@ -75,15 +77,5 @@ public class TestClonerThreadSafety extends TestCase
 				Thread.yield();
 			}
 		}
-	}
-
-	public static Test suite()
-	{
-		final TestSuite testSuite = new TestSuite();
-		for (int i = 0; i < 80; i++)
-		{
-			testSuite.addTest(new ActiveTestSuite(TestClonerThreadSafety.class));
-		}
-		return testSuite;
 	}
 }
