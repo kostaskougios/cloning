@@ -14,7 +14,7 @@ jobs:
       - run: mvn --batch-mode --update-snapshots verify
       - run: mkdir staging && cp target/*-dist.tar.gz target/*.jar staging
       - uses: actions/upload-artifact@v2
-        if: github.ref == 'ref/heads/master'
+        if: ${{ github.ref == 'refs/heads/master' }}
         with:
           name: Package
           path: staging
