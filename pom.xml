@@ -69,7 +69,7 @@
 				<version>3.0.0-M6</version>
 				<configuration>
 					<argLine>
-						--illegal-access=permit
+						--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
 					</argLine>
 					<includes>
 						<include>**/Test*.java</include>
