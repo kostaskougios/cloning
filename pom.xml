@@ -23,6 +23,13 @@
 			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
 		</license>
 	</licenses>
+	<developers>
+		<developer>
+			<name>Chad Wilson</name>
+			<email>chadw@thoughtworks.com</email>
+			<organizationUrl>https://github.com/chadlwilson</organizationUrl>
+		</developer>
+	</developers>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

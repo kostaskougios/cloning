@@ -14,5 +14,5 @@ where X=your gpg password
 Check it, then release it
 
 ```shell
-mvn -P sonatype-deploy mvn nexus-staging:release
+mvn -P sonatype-deploy nexus-staging:release
 ```
