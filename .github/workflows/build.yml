@@ -16,7 +16,7 @@ jobs:
           distribution: 'adopt'
       - run: mvn --batch-mode --update-snapshots verify
       - run: mkdir staging && cp target/*-dist.tar.gz target/*.jar staging
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           name: Package
