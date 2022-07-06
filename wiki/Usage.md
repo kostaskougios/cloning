@@ -1,31 +1,31 @@
-# WARNING #
+# WARNING
 
-Cloning can be potentially dangerous. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects
+**Cloning can be potentially dangerous**. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects
 returned by ORM libraries) means a big graph of objects might be cloned which can lead to performance issues and
 potential crashes. Always enable cloner's debug mode during development, which will print all cloned classes to the
-console : cloner.setDumpClonedClasses(true)
+console: `cloner.setDumpClonedClasses(true)`
 
-# Jdk 8 , 9 and 10
+# JDK 8, 9 and 10
 
-From version 1.11.0, cloner requires jdk 11 or better. Please use an older cloner version if you want to use an older
-jdk.
+Starting with version 1.11.0 `cloner` requires JDK 11 or newer. Please use an older cloner version if you want to use an older
+JDK.
 
-# Jdk 9 and above
+# JDK 9 and above
 
-You may get a warning in jdk 9 due to the reflection that the cloning library uses to clone objects:
+You may get a warning in JDK 9 due to the reflection that the cloning library uses to clone objects:
 
     WARNING: An illegal reflective access operation has occurred
-    WARNING: Illegal reflective access by com.rits.cloning.Cloner 
+    WARNING: Illegal reflective access by com.rits.cloning.Cloner
     WARNING: Please consider reporting this to the maintainers of com.rits.cloning.Cloner
     WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
     WARNING: All illegal access operations will be denied in a future release
 
 Please use java flag `--illegal-access=permit` to allow usage of cloner.
 
-# Example #
+# Example
 
 You can create a single instance of cloner and use it throughout your application to deep clone objects. Once
-instantiated and configured, then the cloner is thread safe and can be reused, provided it's configuration is not
+instantiated and configured, then the cloner is thread safe and can be reused, provided its configuration is not
 altered.
 
 i.e.
@@ -39,7 +39,7 @@ MyClass clone=cloner.deepClone(o);
 
 Cloner is thread safe.
 
-# Spring framework #
+# Spring framework
 
 If you use spring, you can declare Cloner as a bean:
 ```
@@ -68,9 +68,9 @@ or ...
 </bean>
 ```
 
-# Avoid cloning certain classes, null-ifying other classes and registering your own immutables #
+# Avoid cloning certain classes, null-ifying other classes and registering your own immutables
 
-The library doesn't clone jdk's immutable objects, i.e. Strings won't be cloned (this is hardcoded into the lib since there is no way to know which classes are immutable). Also you can skip cloning of certain classes if you call cloner.dontClone(X.class). The reference of any instance of X will be used instead of cloning X and any modification of X in the cloned object will be reflected to the original object. This is useful for singletons and i.e. if you clone hibernate entities because the SessionImplementor class shouldn't be cloned:
+The library doesn't clone JDK's immutable objects, i.e. Strings won't be cloned (this is hardcoded into the lib since there is no way to know which classes are immutable). Also you can skip cloning of certain classes if you call cloner.dontClone(X.class). The reference of any instance of X will be used instead of cloning X and any modification of X in the cloned object will be reflected to the original object. This is useful for singletons and i.e. if you clone hibernate entities because the SessionImplementor class shouldn't be cloned:
 
 ```
 cloner.dontClone(SessionImplementor.class, JDBCTransaction.class, SessionImpl.class);
@@ -94,7 +94,7 @@ And you can register immutables calling
 cloner.registerImmutable(X.class);
 ```
 
-# Constants #
+# Constants
 
 Constants that are used with the == operator, must be registered (once) in order for them not to be cloned, i.e.
 
@@ -102,7 +102,7 @@ Constants that are used with the == operator, must be registered (once) in order
 ...
 private static final Object MUTEX=new Object();
 ...
-	
+
 cloner.registerConstant(MyClass.class,"MUTEX"); // reflection is used to read the private field
 ```
 
@@ -111,7 +111,7 @@ or
 cloner.registerConstant( MUTEX ); // if you have access to the constant
 ```
 
-# Dumping cloned classes to the console #
+# Dumping cloned classes to the console
 
 During dev, periodically enable dumping of cloned classes to the console. This way you can see which classes are cloned and exclude those that shouldn't be cloned:
 
@@ -119,7 +119,7 @@ During dev, periodically enable dumping of cloned classes to the console. This w
 cloner.setDumpClonedClasses(true);
 ```
 
-# Fast cloners #
+# Fast cloners
 
 You can manually clone some of your classes to improve cloning performance. Instantiating the class and copying fields might be faster in several cases. Please Check IFastCloner interface and cloner.registerFastCloner(Class c, IFastCloner fastCloner).
 In case you need to clone a custom collection or map, please extend one of the abstract FastClonerCustom**classes.**
@@ -144,11 +144,11 @@ public class FastClonerHashMap implements IFastCloner
 
 ```
 
-# Immutable #
+# Immutable
 
 Since 1.7.5 there is a new annotation: @Immutable . Marking a class as @Immutable instructs the cloner to avoid cloning it - a performance optimisation. Please check the source of com.rits.cloning.Immutable for further info.
 
-By default, cloner comes with it's own `@Immutable`. If you want to override this, subclass cloner, i.e.
+By default, cloner comes with its own `@Immutable`. If you want to override this, subclass cloner, i.e.
 
 ```
 @Target(TYPE)
@@ -178,7 +178,7 @@ final Cloner cloner = new Cloner()
 };
 ```
 
-# Null Fields #
+# Null Fields
 
 If you want to null fields which are annotated by a specific annotation, you can register
 this annotation using the method:
@@ -187,6 +187,6 @@ this annotation using the method:
 cloner.nullInsteadOfCloneFieldAnnotation(NullAnnotation.class)
 ```
 
-# More ... #
+# More ...
 
 Can be found by looking at the test cases : https://github.com/kostaskougios/cloning/tree/master/src/test/java/com/rits/tests/cloning
