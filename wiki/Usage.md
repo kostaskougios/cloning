@@ -3,7 +3,7 @@
 **Cloning can be potentially dangerous**. Cloning files, streams can make the JVM crash. Also cloning proxies (i.e. objects
 returned by ORM libraries) means a big graph of objects might be cloned which can lead to performance issues and
 potential crashes. Always enable cloner's debug mode during development, which will print all cloned classes to the
-console : cloner.setDumpClonedClasses(true)
+console: `cloner.setDumpClonedClasses(true)`
 
 # JDK 8, 9 and 10
 
@@ -15,7 +15,7 @@ JDK.
 You may get a warning in JDK 9 due to the reflection that the cloning library uses to clone objects:
 
     WARNING: An illegal reflective access operation has occurred
-    WARNING: Illegal reflective access by com.rits.cloning.Cloner 
+    WARNING: Illegal reflective access by com.rits.cloning.Cloner
     WARNING: Please consider reporting this to the maintainers of com.rits.cloning.Cloner
     WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
     WARNING: All illegal access operations will be denied in a future release
@@ -102,7 +102,7 @@ Constants that are used with the == operator, must be registered (once) in order
 ...
 private static final Object MUTEX=new Object();
 ...
-	
+
 cloner.registerConstant(MyClass.class,"MUTEX"); // reflection is used to read the private field
 ```
 
