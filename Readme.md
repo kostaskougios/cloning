@@ -15,3 +15,17 @@ MyClass clone=cloner.deepClone(o);
 ## Useful links ##
   * [Usage details and examples](wiki/Usage.md)
   * [Maven Dependency definition](wiki/Maven_Dependency.md)
+
+
+
+## Our thanks
+
+![yourkit](https://www.yourkit.com/images/yklogo.png)
+
+To yourkit for their excellent profiler.
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/),
+[YourKit .NET Profiler](https://www.yourkit.com/dotnet-profiler/),
+and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
