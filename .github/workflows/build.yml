@@ -7,17 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [11, 15, 16, 17]
+        java-version: [17, 21]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+          distribution: 'temurin'
       - run: mvn --batch-mode --update-snapshots verify
       - run: mkdir staging && cp target/*-dist.tar.gz target/*.jar staging
       - uses: actions/upload-artifact@v4
-        if: ${{ github.ref == 'refs/heads/master' && matrix.java-version == 17 }}
+        if: ${{ github.ref == 'refs/heads/master' && matrix.java-version == 21 }}
         with:
           name: Package
           path: staging
