@@ -31,7 +31,7 @@ public class Cloner {
 	private final Set<Class<?>> nullInstead = new HashSet<>();
 	private final Set<Class<? extends Annotation>> nullInsteadFieldAnnotations = new HashSet<>();
 	private final Map<Class<?>, IFastCloner> fastCloners = new HashMap<>();
-	private final ConcurrentHashMap<Class<?>, List<Field>> fieldsCache = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Class<?>, Map<Field, Object /*cookie*/>> fieldsCache = new ConcurrentHashMap<>();
 	private List<ICloningStrategy> cloningStrategies;
 
 	private Map<Object, Object> ignoredInstances;
@@ -148,12 +148,10 @@ public class Cloner {
 
 	public void registerConstant(Class<?> c, String privateFieldName) {
 		try {
-			List<Field> fields = allFields(c);
-			for (Field field : fields) {
+			for (var entry : getFieldToCookieMap(c).entrySet()) {
+				Field field = entry.getKey();
 				if (field.getName().equals(privateFieldName)) {
-					field.setAccessible(true);
-					final Object v = field.get(null);
-					registerConstant(v);
+					registerConstant(Fields.ACCESSOR.get(field, entry.getValue(), null));
 					return;
 				}
 			}
@@ -210,8 +208,7 @@ public class Cloner {
 	 */
 	public void registerStaticFields(final Class<?>... classes) {
 		for (final Class<?> c : classes) {
-			final List<Field> fields = allFields(c);
-			for (final Field field : fields) {
+			for (final Field field : getFieldToCookieMap(c).keySet()) {
 				final int mods = field.getModifiers();
 				if (Modifier.isStatic(mods) && !field.getType().isPrimitive()) {
 					registerConstant(c, field.getName());
@@ -572,6 +569,7 @@ public class Cloner {
 	private class CloneObjectCloner implements IDeepCloner {
 
 		private final Field[] fields;
+		private final Object[] cookies;
 		private final boolean[] shouldClone;
 		private final int numFields;
 		private final ObjectInstantiator<?> instantiator;
@@ -586,9 +584,6 @@ public class Cloner {
 					int modifiers = f.getModifiers();
 					boolean isStatic = Modifier.isStatic(modifiers);
 					if (!isStatic) {
-						if (!f.isAccessible()) {
-							f.setAccessible(true);
-						}
 						if (!(nullTransient && Modifier.isTransient(modifiers)) && !isFieldNullInsteadBecauseOfAnnotation(f)) {
 							l.add(f);
 							boolean shouldClone = (cloneSynthetics || !f.isSynthetic()) && (cloneAnonymousParent || !isAnonymousParent(f));
@@ -600,8 +595,10 @@ public class Cloner {
 			fields = l.toArray(EMPTY_FIELD_ARRAY);
 			numFields = fields.length;
 			shouldClone = new boolean[numFields];
-			for (int i = 0; i < shouldCloneList.size(); i++) {
+			cookies = new Object[numFields];
+			for (int i = 0; i < numFields; i++) {
 				shouldClone[i] = shouldCloneList.get(i);
+				cookies[i] = Fields.ACCESSOR.getCookie(fields[i]);
 			}
 			instantiator = instantiationStrategy.getInstantiatorOf(clz);
 		}
@@ -629,18 +626,22 @@ public class Cloner {
 					clones.put(o, newInstance);
 					for (int i = 0; i < numFields; i++) {
 						Field field = fields[i];
-						Object fieldObject = field.get(o);
-						Object fieldObjectClone = shouldClone[i] ? applyCloningStrategy(clones, o, fieldObject, field) : fieldObject;
-						field.set(newInstance, fieldObjectClone);
-						if (dumpCloned != null && fieldObjectClone != fieldObject) {
-							dumpCloned.cloning(field, o.getClass());
+						Object cookie = cookies[i];
+						if (shouldClone[i]) {
+							Object fieldObject = Fields.ACCESSOR.get(field, cookie, o);
+							Object fieldObjectClone = applyCloningStrategy(clones, o, fieldObject, field);
+							Fields.ACCESSOR.set(field, cookie, newInstance, fieldObjectClone);
+							if (dumpCloned != null && fieldObjectClone != fieldObject) {
+								dumpCloned.cloning(field, o.getClass());
+							}
+						} else {
+							Fields.ACCESSOR.copy(field, cookie, o, newInstance);
 						}
 					}
 				} else {
 					// Shallow clone
 					for (int i = 0; i < numFields; i++) {
-						Field field = fields[i];
-						field.set(newInstance, field.get(o));
+						Fields.ACCESSOR.copy(fields[i], cookies[i], o, newInstance);
 					}
 				}
 				return newInstance;
@@ -686,15 +687,13 @@ public class Cloner {
 			}
 			return;
 		}
-		final List<Field> fields = allFields(srcClz);
-		final List<Field> destFields = allFields(dest.getClass());
-		for (final Field field : fields) {
+		final Set<Field> destFields = getFieldToCookieMap(dest.getClass()).keySet();
+		for (var entry : getFieldToCookieMap(srcClz).entrySet()) {
+			Field field = entry.getKey();
 			if (!Modifier.isStatic(field.getModifiers())) {
 				try {
-					final Object fieldObject = field.get(src);
-					field.setAccessible(true);
 					if (destFields.contains(field)) {
-						field.set(dest, fieldObject);
+						Fields.ACCESSOR.copy(field, entry.getValue(), src, dest);
 					}
 				} catch (final IllegalArgumentException e) {
 					throw new CloningException(e);
@@ -708,12 +707,9 @@ public class Cloner {
 	/**
 	 * reflection utils
 	 */
-	private void addAll(final List<Field> l, final Field[] fields) {
+	private void addAll(final Map<Field, Object> m, final Field[] fields) {
 		for (final Field field : fields) {
-			if (!field.isAccessible()) {
-				field.setAccessible(true);
-			}
-			l.add(field);
+			m.put(field, Fields.ACCESSOR.getCookie(field));
 		}
 	}
 
@@ -721,18 +717,47 @@ public class Cloner {
 	 * reflection utils, override this to choose which fields to clone
 	 */
 	protected List<Field> allFields(final Class<?> c) {
-		List<Field> l = fieldsCache.get(c);
-		if (l == null) {
-			l = new LinkedList<>();
+		Map<Field, Object> m = fieldsCache.get(c);
+		if (m == null) {
+			m = new LinkedHashMap<>();
 			final Field[] fields = c.getDeclaredFields();
-			addAll(l, fields);
+			addAll(m, fields);
 			Class<?> sc = c;
 			while ((sc = sc.getSuperclass()) != Object.class && sc != null) {
-				addAll(l, sc.getDeclaredFields());
+				addAll(m, sc.getDeclaredFields());
 			}
-			fieldsCache.putIfAbsent(c, l);
+			Map<Field, Object> m0 = fieldsCache.putIfAbsent(c, m);
+			if (m0 != null) {
+				m = m0;
+			}
 		}
-		return l;
+		return List.copyOf(m.keySet());
+	}
+
+	/**
+	 * Return a mapping of {@link Field}s to their {@link Fields.Accessor#getCookie cookies}.
+	 *
+	 * </p>This method is not overrideable, but only exposes the fields from {@link #allFields}.
+	 *
+	 * @return the map of fields to cookies
+	 */
+	private Map<Field, Object> getFieldToCookieMap(final Class<?> c) {
+		Map<Field, Object> m = fieldsCache.get(c);
+		if (m == null) {
+			List<Field> fields = allFields(c); // may be overridden
+			m = fieldsCache.get(c); // may have been fully populated by call to *our* allFields
+			if (m == null) {
+				m = new HashMap<>();
+				for (final Field field : fields) {
+					m.put(field, Fields.ACCESSOR.getCookie(field));
+				}
+				Map<Field, Object> m0 = fieldsCache.putIfAbsent(c, m);
+				if (m0 != null) {
+					m = m0;
+				}
+			}
+		}
+		return m;
 	}
 
 	public boolean isDumpClonedClasses() {
