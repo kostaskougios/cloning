@@ -705,56 +705,39 @@ public class Cloner {
 	}
 
 	/**
-	 * reflection utils
+	 * Return a list of the {@link Field}s to include for a given class.
+	 *
+	 * <p>This method may be overridden to exclude certain fields from cloning.
+	 *
+	 * @return the field list
 	 */
-	private void addAll(final Map<Field, Object> m, final Field[] fields) {
-		for (final Field field : fields) {
-			m.put(field, Fields.ACCESSOR.getCookie(field));
+	protected List<Field> allFields(Class<?> c) {
+		List<Field> l = new ArrayList<>();
+		while (c != Object.class && c != null) {
+			Collections.addAll(l, c.getDeclaredFields());
+			c = c.getSuperclass();
 		}
-	}
-
-	/**
-	 * reflection utils, override this to choose which fields to clone
-	 */
-	protected List<Field> allFields(final Class<?> c) {
-		Map<Field, Object> m = fieldsCache.get(c);
-		if (m == null) {
-			m = new LinkedHashMap<>();
-			final Field[] fields = c.getDeclaredFields();
-			addAll(m, fields);
-			Class<?> sc = c;
-			while ((sc = sc.getSuperclass()) != Object.class && sc != null) {
-				addAll(m, sc.getDeclaredFields());
-			}
-			Map<Field, Object> m0 = fieldsCache.putIfAbsent(c, m);
-			if (m0 != null) {
-				m = m0;
-			}
-		}
-		return List.copyOf(m.keySet());
+		return l;
 	}
 
 	/**
 	 * Return a mapping of {@link Field}s to their {@link Fields.Accessor#getCookie cookies}.
 	 *
-	 * </p>This method is not overrideable, but only exposes the fields from {@link #allFields}.
+	 * <p>This method is not overrideable, but only exposes the fields from {@link #allFields}.
 	 *
 	 * @return the map of fields to cookies
 	 */
 	private Map<Field, Object> getFieldToCookieMap(final Class<?> c) {
 		Map<Field, Object> m = fieldsCache.get(c);
 		if (m == null) {
-			List<Field> fields = allFields(c); // may be overridden
-			m = fieldsCache.get(c); // may have been fully populated by call to *our* allFields
-			if (m == null) {
-				m = new HashMap<>();
-				for (final Field field : fields) {
-					m.put(field, Fields.ACCESSOR.getCookie(field));
-				}
-				Map<Field, Object> m0 = fieldsCache.putIfAbsent(c, m);
-				if (m0 != null) {
-					m = m0;
-				}
+			List<Field> fields = allFields(c);
+			m = new HashMap<>();
+			for (final Field field : fields) {
+				m.put(field, Fields.ACCESSOR.getCookie(field));
+			}
+			Map<Field, Object> m0 = fieldsCache.putIfAbsent(c, m);
+			if (m0 != null) {
+				m = m0;
 			}
 		}
 		return m;
