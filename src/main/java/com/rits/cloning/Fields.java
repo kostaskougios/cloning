@@ -271,7 +271,8 @@ class Fields {
                 Map<Field, Long> map = new HashMap<>();
                 for (Field f : clz.getDeclaredFields()) {
                     try {
-                        map.put(f, Modifier.isStatic(f.getModifiers()) ? u.staticFieldOffset(f) : u.objectFieldOffset(f));
+                        long of = Modifier.isStatic(f.getModifiers()) ? u.staticFieldOffset(f) : u.objectFieldOffset(f);
+                        map.put(f, of < 0 ? null : of);
                     } catch (UnsupportedOperationException e) {
                         map.put(f, null); // skip the field, this will result in get/set/copy falling back on VarHandle
                     }
