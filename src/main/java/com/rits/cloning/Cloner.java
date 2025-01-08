@@ -5,7 +5,6 @@ import org.objenesis.instantiator.ObjectInstantiator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -72,8 +71,8 @@ public class Cloner {
 
 	/**
 	 * this makes the cloner to set a transient field to null upon cloning.
-	 *
-	 * NOTE: primitive types can't be nulled. Their value will be set to default, i.e. 0 for int
+	 * <p>
+	 * NOTE: primitive types can't be null-ed. Their value will be set to default, i.e. 0 for int
 	 *
 	 * @param nullTransient true for transient fields to be nulled
 	 */
@@ -130,10 +129,10 @@ public class Cloner {
 		}
 	}
 
-	private IDeepCloner deepCloner = this::cloneInternal;
+	private final IDeepCloner deepCloner = this::cloneInternal;
 
 	protected Object fastClone(final Object o, final Map<Object, Object> clones) {
-		final Class<? extends Object> c = o.getClass();
+		final Class<?> c = o.getClass();
 		final IFastCloner fastCloner = fastCloners.get(c);
 		if (fastCloner != null) return fastCloner.clone(o, deepCloner, clones);
 		return null;
@@ -200,7 +199,7 @@ public class Cloner {
 	/**
 	 * registers all static fields of these classes. Those static fields won't be cloned when an instance
 	 * of the class is cloned.
-	 *
+	 * <p>
 	 * This is useful i.e. when a static field object is added into maps or sets. At that point, there is no
 	 * way for the cloner to know that it was static except if it is registered.
 	 *
@@ -234,15 +233,11 @@ public class Cloner {
 	 *          be added to the clone.
 	 */
 	public void dontClone(final Class<?>... c) {
-		for (final Class<?> cl : c) {
-			ignored.add(cl);
-		}
+		Collections.addAll(ignored, c);
 	}
 
 	public void dontCloneInstanceOf(final Class<?>... c) {
-		for (final Class<?> cl : c) {
-			ignoredInstanceOf.add(cl);
-		}
+		Collections.addAll(ignoredInstanceOf, c);
 	}
 
 	public void setDontCloneInstanceOf(final Class<?>... c) {
@@ -255,9 +250,7 @@ public class Cloner {
 	 * @param c the classes to nullify during cloning
 	 */
 	public void nullInsteadOfClone(final Class<?>... c) {
-		for (final Class<?> cl : c) {
-			nullInstead.add(cl);
-		}
+		Collections.addAll(nullInstead, c);
 	}
 
 	// spring framework friendly version of nullInsteadOfClone
@@ -272,9 +265,7 @@ public class Cloner {
 	 */
 	@SafeVarargs
 	final public void nullInsteadOfCloneFieldAnnotation(final Class<? extends Annotation>... a) {
-		for (final Class<? extends Annotation> an : a) {
-			nullInsteadFieldAnnotations.add(an);
-		}
+		Collections.addAll(nullInsteadFieldAnnotations, a);
 	}
 
 	// spring framework friendly version of nullInsteadOfCloneAnnotation
@@ -288,9 +279,7 @@ public class Cloner {
 	 * @param c the immutable class
 	 */
 	public void registerImmutable(final Class<?>... c) {
-		for (final Class<?> cl : c) {
-			ignored.add(cl);
-		}
+		Collections.addAll(ignored, c);
 	}
 
 	// spring framework friendly version of registerImmutable
@@ -422,7 +411,7 @@ public class Cloner {
 		return false;
 	}
 
-	private Map<Class, IDeepCloner> cloners = new ConcurrentHashMap<>();
+	private final Map<Class<?>, IDeepCloner> cloners = new ConcurrentHashMap<>();
 
 	@SuppressWarnings("unchecked")
 	protected <T> T cloneInternal(T o, Map<Object, Object> clones) {
@@ -481,9 +470,9 @@ public class Cloner {
 
 	private class CloneArrayCloner implements IDeepCloner {
 
-		private boolean primitive;
-		private boolean immutable;
-		private Class<?> componentType;
+		private final boolean primitive;
+		private final boolean immutable;
+		private final Class<?> componentType;
 
 		CloneArrayCloner(Class<?> clz) {
 			primitive = clz.getComponentType().isPrimitive();
@@ -518,8 +507,8 @@ public class Cloner {
 	}
 
 	private class FastClonerCloner implements IDeepCloner {
-		private IFastCloner fastCloner;
-		private IDeepCloner cloneInternal;
+		private final IFastCloner fastCloner;
+		private final IDeepCloner cloneInternal;
 
 		FastClonerCloner(IFastCloner fastCloner) {
 			this.fastCloner = fastCloner;
@@ -533,8 +522,8 @@ public class Cloner {
 		}
 	}
 
-	private static IDeepCloner IGNORE_CLONER = new IgnoreClassCloner();
-	private static IDeepCloner NULL_CLONER = new NullClassCloner();
+	private static final IDeepCloner IGNORE_CLONER = new IgnoreClassCloner();
+	private static final IDeepCloner NULL_CLONER = new NullClassCloner();
 
 	private static class IgnoreClassCloner implements IDeepCloner {
 		public <T> T deepClone(T o, Map<Object, Object> clones) {
@@ -675,8 +664,8 @@ public class Cloner {
 	public <T, E extends T> void copyPropertiesOfInheritedClass(final T src, final E dest) {
 		if (src == null) throw new IllegalArgumentException("src can't be null");
 		if (dest == null) throw new IllegalArgumentException("dest can't be null");
-		final Class<? extends Object> srcClz = src.getClass();
-		final Class<? extends Object> destClz = dest.getClass();
+		final Class<?> srcClz = src.getClass();
+		final Class<?> destClz = dest.getClass();
 		if (srcClz.isArray()) {
 			if (!destClz.isArray())
 				throw new IllegalArgumentException("can't copy from array to non-array class " + destClz);
@@ -695,9 +684,7 @@ public class Cloner {
 					if (destFields.contains(field)) {
 						Fields.ACCESSOR.copy(field, entry.getValue(), src, dest);
 					}
-				} catch (final IllegalArgumentException e) {
-					throw new CloningException(e);
-				} catch (final IllegalAccessException e) {
+				} catch (final IllegalArgumentException | IllegalAccessException e) {
 					throw new CloningException(e);
 				}
 			}
@@ -797,7 +784,7 @@ public class Cloner {
 	/**
 	 * @return if Cloner lib is in a shared jar folder for a container (i.e. tomcat/shared), then
 	 * 		this method is preferable in order to instantiate cloner. Please
-	 * 		see https://code.google.com/p/cloning/issues/detail?id=23
+	 * 		see <a href="https://code.google.com/p/cloning/issues/detail?id=23">here</a>
 	 */
 	public static Cloner shared() {
 		return new Cloner(new ObjenesisInstantiationStrategy());
