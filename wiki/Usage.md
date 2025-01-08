@@ -10,18 +10,6 @@ console: `cloner.setDumpClonedClasses(true)`
 Starting with version 1.11.0 `cloner` requires JDK 11 or newer. Please use an older cloner version if you want to use an older
 JDK.
 
-# JDK 9 and above
-
-You may get a warning in JDK 9 due to the reflection that the cloning library uses to clone objects:
-
-    WARNING: An illegal reflective access operation has occurred
-    WARNING: Illegal reflective access by com.rits.cloning.Cloner
-    WARNING: Please consider reporting this to the maintainers of com.rits.cloning.Cloner
-    WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-    WARNING: All illegal access operations will be denied in a future release
-
-Please use java flag `--illegal-access=permit` to allow usage of cloner.
-
 # Example
 
 You can create a single instance of cloner and use it throughout your application to deep clone objects. Once
