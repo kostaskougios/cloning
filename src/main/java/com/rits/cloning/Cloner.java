@@ -599,7 +599,7 @@ public class Cloner {
 			shouldClone = new boolean[numFields];
 			cookies = new Object[numFields];
 			for (int i = 0; i < numFields; i++) {
-				shouldClone[i] = shouldCloneList.get(i);
+				shouldClone[i] = shouldCloneList.get(i) && !fields[i].getType().isPrimitive();
 				cookies[i] = Fields.ACCESSOR.getCookie(fields[i]);
 			}
 			instantiator = instantiationStrategy.getInstantiatorOf(clz);
