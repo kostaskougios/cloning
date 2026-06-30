@@ -17,19 +17,32 @@ Happy hacking!
 
 --- Only for maintainers ---
 
-If you want to generate a signed bundle so it can be uploaded to the OSS
-Sonatype repository, you will need to run:
+To generate a signed release bundle for the OSS Sonatype repository, run:
 
-mvn clean package gpg:sign repository:bundle-create
+mvn -B clean package gpg:sign repository:bundle-create
 
-You will need to enter the passphrase for your private GPG key at some point.
-Please do not forget to distribute it to hkp://pgp.mit.edu if the signed
-bundle is to be accepted in Maven Central!
+Before running this, make sure you have a private GPG key available and export
+its passphrase for non-interactive signing:
 
+export MAVEN_GPG_PASSPHRASE="your-gpg-passphrase"
 
-to deploy to sonatype:
+If you do not already have a key, create one first:
 
-mvn -P sonatype-deploy -Dgpg.passphrase=X
+gpg --batch --pinentry-mode loopback --passphrase "$MAVEN_GPG_PASSPHRASE" \
+  --quick-generate-key "Your Name <you@example.com>" ed25519 sign 0
 
-where X=your gpg password
+Publish to Sonatype with:
+
+mvn -B -P sonatype-deploy deploy
+
+This requires valid Sonatype credentials in your Maven settings, for example:
+
+<server>
+  <id>sonatype-nexus-staging</id>
+  <username>YOUR_SONATYPE_USERNAME</username>
+  <password>YOUR_SONATYPE_PASSWORD</password>
+</server>
+
+Please do not forget to distribute the public key to a key server (for example
+hkp://pgp.mit.edu) if the signed bundle is to be accepted in Maven Central.
  
