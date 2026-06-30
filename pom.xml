@@ -9,7 +9,7 @@
 	<groupId>io.github.kostaskougios</groupId>
 	<artifactId>cloning</artifactId>
 	<packaging>bundle</packaging>
-	<version>1.12.0</version>
+	<version>1.13.0</version>
 	<name>cloning</name>
 	<url>https://github.com/kostaskougios/cloning/</url>
 	<description><![CDATA[
@@ -175,8 +175,11 @@
 									<passphrase>${env.MAVEN_GPG_PASSPHRASE}</passphrase>
 									<gpgArguments>
 										<arg>--batch</arg>
+										<arg>--yes</arg>
 										<arg>--pinentry-mode</arg>
-										<arg>loopback</arg>
+										<arg>loopback</arg>											<arg>--passphrase</arg>
+											<arg>${env.MAVEN_GPG_PASSPHRASE}</arg>										<arg>--default-key</arg>
+										<arg>F65C9C1C0F9D7292C083424E71617270276B4006</arg>
 									</gpgArguments>
 								</configuration>
 							</execution>
