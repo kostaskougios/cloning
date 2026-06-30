@@ -113,10 +113,6 @@ public class Cloner {
 		registerInaccessibleClassToBeFastCloned("java.util.ArrayList$SubList", subListCloner);
 		registerInaccessibleClassToBeFastCloned("java.util.SubList", subListCloner);
 		registerInaccessibleClassToBeFastCloned("java.util.RandomAccessSubList", subListCloner);
-		FastClonerListOf12 listOf12 = new FastClonerListOf12();
-		registerInaccessibleClassToBeFastCloned("java.util.ImmutableCollections$List12",listOf12);
-		FastClonerSetOf12 setOf12 = new FastClonerSetOf12();
-		registerInaccessibleClassToBeFastCloned("java.util.ImmutableCollections$Set12",setOf12);
 	}
 
 	protected void registerInaccessibleClassToBeFastCloned(String className, IFastCloner fastCloner) {
@@ -147,7 +143,7 @@ public class Cloner {
 
 	public void registerConstant(Class<?> c, String privateFieldName) {
 		try {
-			for (var entry : getFieldToCookieMap(c).entrySet()) {
+			for (Map.Entry<Field, Object> entry : getFieldToCookieMap(c).entrySet()) {
 				Field field = entry.getKey();
 				if (field.getName().equals(privateFieldName)) {
 					registerConstant(Fields.ACCESSOR.get(field, entry.getValue(), null));
@@ -418,15 +414,19 @@ public class Cloner {
 		if (o == null) return null;
 		if (o == this) return null;
 
-		// Prevent cycles, expensive but necessary
-		if (clones != null) {
-			T clone = (T) clones.get(o);
-			if (clone != null) {
-				return clone;
-			}
+		Class<?> aClass = o.getClass();
+
+		// Fast path: most common immutable types - avoid all map lookups
+		// These classes are final and extremely common as field values,
+		// so checking them directly is faster than any map lookup
+		if (aClass == String.class || aClass == Integer.class || aClass == Long.class
+			|| aClass == Boolean.class || aClass == Double.class || aClass == Class.class
+			|| aClass == BigDecimal.class) {
+			return o;
 		}
 
-		Class<?> aClass = o.getClass();
+		// Check cloner cache before cycle detection. For immutable classes,
+		// this avoids the expensive IdentityHashMap.get() call entirely.
 		IDeepCloner cloner = cloners.get(aClass);
 		if (cloner == null) {
 			cloner = findDeepCloner(aClass);
@@ -437,6 +437,15 @@ public class Cloner {
 		} else if (cloner == NULL_CLONER) {
 			return null;
 		}
+
+		// Cycle detection - only needed for mutable objects
+		if (clones != null) {
+			T clone = (T) clones.get(o);
+			if (clone != null) {
+				return clone;
+			}
+		}
+
 		return cloner.deepClone(o, clones);
 	}
 
@@ -586,7 +595,7 @@ public class Cloner {
 			shouldClone = new boolean[numFields];
 			cookies = new Object[numFields];
 			for (int i = 0; i < numFields; i++) {
-				shouldClone[i] = shouldCloneList.get(i);
+				shouldClone[i] = shouldCloneList.get(i) && !fields[i].getType().isPrimitive();
 				cookies[i] = Fields.ACCESSOR.getCookie(fields[i]);
 			}
 			instantiator = instantiationStrategy.getInstantiatorOf(clz);
@@ -677,7 +686,7 @@ public class Cloner {
 			return;
 		}
 		final Set<Field> destFields = getFieldToCookieMap(dest.getClass()).keySet();
-		for (var entry : getFieldToCookieMap(srcClz).entrySet()) {
+		for (Map.Entry<Field, Object> entry : getFieldToCookieMap(srcClz).entrySet()) {
 			Field field = entry.getKey();
 			if (!Modifier.isStatic(field.getModifiers())) {
 				try {

@@ -1,8 +1,6 @@
 package com.rits.cloning;
 
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -15,7 +13,6 @@ import java.util.Map;
  * <ul>
  *     <li>{@code auto} - (default) auto-select best available accessor</li>
  *     <li>{@code unsafe} - fastest and allows for accessing JDK internal fields without the need for {@code --add-opens}</li>
- *     <li>{@code handles} - fast, but requires {@code --add-opens} to access JDK internal fields; falls back on {@code reflection} to set {@code final}s</li>
  *     <li>{@code reflection} - legacy approach, but requires {@code --add-opens} to access JDK internal fields</li>
  * </ul>
  *
@@ -32,7 +29,6 @@ class Fields {
     private enum AccessorType {
         AUTO,
         UNSAFE,
-        HANDLES,
         REFLECTION;
 
         /**
@@ -42,7 +38,6 @@ class Fields {
         private static Accessor<Object> resolve(AccessorType type) {
             switch (type) {
                 case AUTO:   try {return (Accessor) UnsafeAccessor    .INSTANCE;} catch (Throwable e) {/*fall through*/}
-                case HANDLES:     return (Accessor) VarHandleAccessor .INSTANCE;
                 case REFLECTION:  return (Accessor) ReflectionAccessor.INSTANCE;
                 case UNSAFE:      return (Accessor) UnsafeAccessor    .INSTANCE;
                 default:          throw new IllegalArgumentException("Unknown accessor type: " + type);
@@ -114,7 +109,7 @@ class Fields {
 
         @Override
         public Field getCookie(Field field) {
-            field.trySetAccessible();
+            field.setAccessible(true);
             return field;
         }
 
@@ -145,90 +140,6 @@ class Fields {
     }
 
     /**
-     * {@link VarHandle} implementation of {@link Accessor} avoiding per invocation access checks made with reflection.
-     */
-    private static class VarHandleAccessor implements Accessor<VarHandle> {
-        private static final VarHandleAccessor INSTANCE = new VarHandleAccessor();
-
-        /**
-         * Mapping of fields to their {@link VarHandle} for a given class.
-         */
-        private final ClassValue<Map<Field, VarHandle>> handleByField = new ClassValue<>() {
-            /**
-             * The {@link MethodHandles.Lookup} used to find {@link VarHandle}s.
-             */
-            private final MethodHandles.Lookup lookup = MethodHandles.lookup();
-
-            @Override
-            protected Map<Field, VarHandle> computeValue(Class<?> clz) {
-                Map<Field, VarHandle> map = new HashMap<>();
-                try {
-                    MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clz, this.lookup);
-                    for (Field f : clz.getDeclaredFields()) {
-                        f.trySetAccessible();
-                        map.put(f, lookup.unreflectVarHandle(f));
-                    }
-                } catch (ReflectiveOperationException e) {
-                    throw new CloningException(e);
-                }
-
-                return map;
-            }
-        };
-
-        @Override
-        public VarHandle getCookie(Field field) {
-            return handleByField.get(field.getDeclaringClass()).get(field);
-        }
-
-        @Override
-        public Object get(Field field, VarHandle h, Object src) {
-            boolean v = Modifier.isVolatile(field.getModifiers());
-            return src == null
-                    ? v ? h.getVolatile()    : h.get()
-                    : v ? h.getVolatile(src) : h.get(src);
-        }
-
-        @Override
-        public void set(Field field, VarHandle h, Object dst, Object value) throws IllegalAccessException {
-            // note we don't need volatile writes during cloning as dst is not yet visible to other threads
-            if (Modifier.isFinal(field.getModifiers())) { // VarHandle can't update finals; fall back on reflection
-                ReflectionAccessor.INSTANCE.set(field, ReflectionAccessor.INSTANCE.getCookie(field), dst, value);
-            } else if (dst == null) {
-                h.set(value);
-            } else {
-                h.set(dst, value);
-            }
-        }
-
-        @Override
-        public void copy(Field field, VarHandle hand, Object src, Object dst) throws IllegalAccessException {
-            int mods = field.getModifiers();
-            if (Modifier.isFinal(mods)) { // VarHandle can't update finals; fall back on reflection
-                ReflectionAccessor.INSTANCE.copy(field, ReflectionAccessor.INSTANCE.getCookie(field), src, dst);
-                return;
-            }
-
-            // note: we don't need volatile writes during cloning as dst is not yet visible to other threads; volatile
-            // reads are still performed as the source may be visible to other threads
-            Class<?> t = field.getType();
-            boolean v = Modifier.isVolatile(mods);
-
-            // the seemingly needless casts allow VarHandle to optimize out the autoboxing and its garbage
-            if      (!t.isPrimitive()  ) hand.set(dst, v ?           hand.getVolatile(src) :           hand.get(src));
-            else if (t == int.class    ) hand.set(dst, v ?     (int) hand.getVolatile(src) :     (int) hand.get(src));
-            else if (t == long.class   ) hand.set(dst, v ?    (long) hand.getVolatile(src) :    (long) hand.get(src));
-            else if (t == boolean.class) hand.set(dst, v ? (boolean) hand.getVolatile(src) : (boolean) hand.get(src));
-            else if (t == double.class ) hand.set(dst, v ?  (double) hand.getVolatile(src) :  (double) hand.get(src));
-            else if (t == float.class  ) hand.set(dst, v ?   (float) hand.getVolatile(src) :   (float) hand.get(src));
-            else if (t == char.class   ) hand.set(dst, v ?    (char) hand.getVolatile(src) :    (char) hand.get(src));
-            else if (t == byte.class   ) hand.set(dst, v ?    (byte) hand.getVolatile(src) :    (byte) hand.get(src));
-            else if (t == short.class  ) hand.set(dst, v ?   (short) hand.getVolatile(src) :   (short) hand.get(src));
-            else                         hand.set(dst, v ?           hand.getVolatile(src) :           hand.get(src));
-        }
-    }
-
-    /**
      * {@code sun.misc.Unsafe} implementation of {@link Accessor}.
      *
      * <p>This is the only accessor which does not require explicit JVM configuration of {@code --add-opens} to allow
@@ -254,7 +165,7 @@ class Fields {
         private static <UNSAFE> UNSAFE findUnsafe() {
             try {
                 Field theUnsafe = Class.forName("sun.misc.Unsafe").getDeclaredField("theUnsafe");
-                theUnsafe.trySetAccessible();
+                theUnsafe.setAccessible(true);
                 return (UNSAFE) theUnsafe.get(null);
             } catch (ReflectiveOperationException e) {
                 throw new CloningException(e);
@@ -265,7 +176,7 @@ class Fields {
          * Mapping of fields to their offsets for a given class.
          */
         @SuppressWarnings("deprecation")
-        private final ClassValue<Map<Field, Long>> offsetByField = new ClassValue<>() {
+        private final ClassValue<Map<Field, Long>> offsetByField = new ClassValue<Map<Field, Long>>() {
             @Override
             protected Map<Field, Long> computeValue(Class<?> clz) {
                 Map<Field, Long> map = new HashMap<>();
@@ -274,7 +185,7 @@ class Fields {
                         long of = Modifier.isStatic(f.getModifiers()) ? u.staticFieldOffset(f) : u.objectFieldOffset(f);
                         map.put(f, of < 0 ? null : of);
                     } catch (UnsupportedOperationException e) {
-                        map.put(f, null); // skip the field, this will result in get/set/copy falling back on VarHandle
+                        map.put(f, null); // skip the field, this will result in get/set/copy falling back on reflection
                     }
                 }
                 return map;
@@ -285,7 +196,7 @@ class Fields {
          * Mapping of static fields to their "base object" for a given class.
          */
         @SuppressWarnings("deprecation")
-        private final ClassValue<Map<Field, Object>> baseByStaticField = new ClassValue<>() {
+        private final ClassValue<Map<Field, Object>> baseByStaticField = new ClassValue<Map<Field, Object>>() {
             @Override
             protected Map<Field, Object> computeValue(Class<?> clz) {
                 Map<Field, Object> map = new HashMap<>();
@@ -294,7 +205,7 @@ class Fields {
                         try {
                             map.put(f, u.staticFieldBase(f));
                         } catch (UnsupportedOperationException e) {
-                            map.put(f, null); // skip the field, this will result in get/set/copy falling back on VarHandle
+                            map.put(f, null); // skip the field, this will result in get/set/copy falling back on reflection
                         }
                     }
                 }
@@ -308,9 +219,9 @@ class Fields {
         }
 
         @Override
-        public Object get(Field field, Long of, Object src) {
-            if (of == null && (of = getCookie(field)) == null) { // fall back on safe mechanisms
-                return VarHandleAccessor.INSTANCE.get(field, VarHandleAccessor.INSTANCE.getCookie(field), src);
+        public Object get(Field field, Long of, Object src) throws IllegalAccessException {
+            if (of == null && (of = getCookie(field)) == null) { // fall back on reflection
+                return ReflectionAccessor.INSTANCE.get(field, ReflectionAccessor.INSTANCE.getCookie(field), src);
             }
 
             Class<?> t = field.getType();
@@ -326,13 +237,13 @@ class Fields {
                     : t == char.class    ? v ? u.getCharVolatile   (src2, of) : u.getChar   (src2, of)
                     : t == byte.class    ? v ? u.getByteVolatile   (src2, of) : u.getByte   (src2, of)
                     : t == short.class   ? v ? u.getShortVolatile  (src2, of) : u.getShort  (src2, of)
-                    : VarHandleAccessor.INSTANCE.get(field, VarHandleAccessor.INSTANCE.getCookie(field), src);
+                    : ReflectionAccessor.INSTANCE.get(field, ReflectionAccessor.INSTANCE.getCookie(field), src);
         }
 
         @Override
         public void set(Field field, Long of, Object dst, Object value) throws IllegalAccessException {
-            if (of == null && (of = getCookie(field)) == null) { // fall back on safe mechanisms
-                VarHandleAccessor.INSTANCE.set(field, VarHandleAccessor.INSTANCE.getCookie(field), dst, value);
+            if (of == null && (of = getCookie(field)) == null) { // fall back on reflection
+                ReflectionAccessor.INSTANCE.set(field, ReflectionAccessor.INSTANCE.getCookie(field), dst, value);
                 return;
             }
 
@@ -348,14 +259,14 @@ class Fields {
             else if (t == char.class   ) u.putChar   (dst2, of,    (char) value);
             else if (t == byte.class   ) u.putByte   (dst2, of,    (byte) value);
             else if (t == short.class  ) u.putShort  (dst2, of,   (short) value);
-            else VarHandleAccessor.INSTANCE.set(field, VarHandleAccessor.INSTANCE.getCookie(field), dst, value);
+            else ReflectionAccessor.INSTANCE.set(field, ReflectionAccessor.INSTANCE.getCookie(field), dst, value);
         }
 
         @Override
         public void copy(Field field, Long of, Object src, Object dst) throws IllegalAccessException {
             int mods = field.getModifiers();
-            if (Modifier.isStatic(mods) || (of == null && (of = getCookie(field)) == null)) { // fall back on safe mechanisms
-                VarHandleAccessor.INSTANCE.copy(field, VarHandleAccessor.INSTANCE.getCookie(field), src, dst);
+            if (Modifier.isStatic(mods) || (of == null && (of = getCookie(field)) == null)) { // fall back on reflection
+                ReflectionAccessor.INSTANCE.copy(field, ReflectionAccessor.INSTANCE.getCookie(field), src, dst);
                 return;
             }
 
@@ -372,7 +283,7 @@ class Fields {
             else if (t == char.class   ) u.putChar   (dst, of, v ? u.getCharVolatile   (src, of) : u.getChar   (src, of));
             else if (t == byte.class   ) u.putByte   (dst, of, v ? u.getByteVolatile   (src, of) : u.getByte   (src, of));
             else if (t == short.class  ) u.putShort  (dst, of, v ? u.getShortVolatile  (src, of) : u.getShort  (src, of));
-            else VarHandleAccessor.INSTANCE.copy(field, VarHandleAccessor.INSTANCE.getCookie(field), src, dst);
+            else ReflectionAccessor.INSTANCE.copy(field, ReflectionAccessor.INSTANCE.getCookie(field), src, dst);
         }
     }
 }
