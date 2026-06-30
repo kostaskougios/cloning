@@ -32,14 +32,22 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<scm>
-		<connection>scm:git:https://kostas.kougios@code.google.com/p/cloning/</connection>
-		<developerConnection>scm:git:https://kostas.kougios@code.google.com/p/cloning/</developerConnection>
-		<url>https://code.google.com/p/cloning/source/browse/</url>
+		<connection>scm:git:https://github.com/kostaskougios/cloning.git</connection>
+		<developerConnection>scm:git:git@github.com:kostaskougios/cloning.git</developerConnection>
+		<url>https://github.com/kostaskougios/cloning</url>
 	</scm>
 	<issueManagement>
-		<system>Google Code</system>
-		<url>https://code.google.com/p/cloning/issues/list</url>
+		<system>GitHub Issues</system>
+		<url>https://github.com/kostaskougios/cloning/issues</url>
 	</issueManagement>
+	<developers>
+		<developer>
+			<id>kostaskougios</id>
+			<name>Kostas Kougios</name>
+			<email>kostas.kougios@googlemail.com</email>
+			<url>https://github.com/kostaskougios</url>
+		</developer>
+	</developers>
 	<build>
 		<plugins>
 			<plugin>
@@ -122,6 +130,15 @@
 				<version>6.0.0</version>
 				<extensions>true</extensions>
 			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.11.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -169,10 +186,4 @@
 			</build>
 		</profile>
 	</profiles>
-<distributionManagement>
-  <repository>
-    <id>sonatype-nexus-staging</id>
-    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-  </repository>
-</distributionManagement>
 </project>
