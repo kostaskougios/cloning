@@ -20,7 +20,7 @@ Happy hacking!
 To generate a signed release bundle for the Sonatype Central Publisher Portal,
 run:
 
-mvn -B clean package gpg:sign repository:bundle-create
+mvn -B clean package -P sonatype-deploy gpg:sign repository:bundle-create
 
 Before running this, make sure you have a private GPG key available and export
 its passphrase for non-interactive signing:
